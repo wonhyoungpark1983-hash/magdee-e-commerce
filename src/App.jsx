@@ -6,10 +6,6 @@ import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/AdminDashboard';
-import OrdersPage from './pages/admin/OrdersPage';
-import CustomersPage from './pages/admin/CustomersPage';
-import AnalyticsPage from './pages/admin/AnalyticsPage';
-import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 
 function App() {
@@ -70,10 +66,7 @@ function App() {
           {/* Admin Routes without Navbar */}
           <Route path="/admin" element={<AdminLoginPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/dashboard/orders" element={<OrdersPage />} />
-          <Route path="/admin/dashboard/customers" element={<CustomersPage />} />
-          <Route path="/admin/dashboard/analytics" element={<AnalyticsPage />} />
-          <Route path="/admin/dashboard/settings" element={<AdminSettingsPage />} />
+          <Route path="/admin/dashboard/*" element={<AdminDashboard />} />
         </Routes>
       </Router>
     </ProductProvider>
