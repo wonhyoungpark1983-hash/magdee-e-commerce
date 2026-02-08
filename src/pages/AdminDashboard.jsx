@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Plus, Edit, Trash2, LogOut, Menu, X, Star, TrendingUp } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { supabase } from '../lib/supabaseClient';
 import { useProducts } from '../context/ProductContext';
 
 const AdminDashboard = () => {
@@ -384,14 +385,53 @@ const AdminDashboard = () => {
                                     required
                                 />
 
-                                <Input
-                                    label="Image URL"
-                                    name="image"
-                                    value={formData.image}
-                                    onChange={handleInputChange}
-                                    placeholder="https://example.com/image.jpg"
-                                    required
-                                />
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Product Image
+                                    </label>
+                                    <div className="flex flex-col space-y-2">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={async (e) => {
+                                                const file = e.target.files[0];
+                                                if (!file) return;
+
+                                                try {
+                                                    const fileExt = file.name.split('.').pop();
+                                                    const fileName = `${Math.random()}.${fileExt}`;
+                                                    const filePath = `${fileName}`;
+
+                                                    const { error: uploadError } = await supabase.storage
+                                                        .from('product-images')
+                                                        .upload(filePath, file);
+
+                                                    if (uploadError) throw uploadError;
+
+                                                    const { data: { publicUrl } } = supabase.storage
+                                                        .from('product-images')
+                                                        .getPublicUrl(filePath);
+
+                                                    setFormData(prev => ({ ...prev, image: publicUrl }));
+                                                    alert('Image uploaded successfully!');
+                                                } catch (error) {
+                                                    console.error('Error uploading image:', error.message);
+                                                    alert('Error uploading image. Please make sure the "product-images" bucket exists in Supabase.');
+                                                }
+                                            }}
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent file:bg-opacity-10 file:text-accent hover:file:bg-opacity-20 transition-all cursor-pointer"
+                                        />
+                                        <p className="text-xs text-gray-500">Or enter an image URL below:</p>
+                                    </div>
+                                    <Input
+                                        label="Image URL"
+                                        name="image"
+                                        value={formData.image}
+                                        onChange={handleInputChange}
+                                        placeholder="https://example.com/image.jpg"
+                                        required
+                                    />
+                                </div>
 
                                 <Input
                                     label="Sizes (comma-separated)"
