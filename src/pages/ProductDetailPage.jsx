@@ -16,6 +16,14 @@ const ProductDetailPage = () => {
     const [selectedColor, setSelectedColor] = useState('');
     const [quantity, setQuantity] = useState(1);
 
+    // Defensive data handling for sizes and colors (handles both Array and String)
+    const getArrayData = (data) => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (typeof data === 'string') return data.split(',').map(s => s.trim()).filter(s => s !== '');
+        return [];
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -35,8 +43,11 @@ const ProductDetailPage = () => {
         );
     }
 
-    const stockStatus = product.stock > 10 ? 'In Stock' : 'Low Stock';
-    const stockColor = product.stock > 10 ? 'text-green-600' : 'text-orange-600';
+    const stockStatus = (product.stock || 0) > 10 ? 'In Stock' : 'Low Stock';
+    const stockColor = (product.stock || 0) > 10 ? 'text-green-600' : 'text-orange-600';
+
+    const productSizes = getArrayData(product.sizes);
+    const productColors = getArrayData(product.colors);
 
     return (
         <div className="min-h-screen bg-white">
@@ -69,7 +80,7 @@ const ProductDetailPage = () => {
                             {product.name}
                         </h1>
                         <p className="text-3xl font-bold text-gray-900 mb-4">
-                            ₩{product.price.toLocaleString()}
+                            ₩{(product.price || 0).toLocaleString()}
                         </p>
 
                         <div className="mb-6">
@@ -79,13 +90,13 @@ const ProductDetailPage = () => {
                         </div>
 
                         {/* Available Sizes */}
-                        {product.sizes && product.sizes.length > 0 && (
+                        {productSizes.length > 0 && (
                             <div className="mb-6">
                                 <label className="block text-sm font-semibold text-gray-900 mb-3">
                                     Available Sizes
                                 </label>
                                 <div className="flex flex-wrap gap-2">
-                                    {product.sizes.map((size) => (
+                                    {productSizes.map((size) => (
                                         <button
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
@@ -102,13 +113,13 @@ const ProductDetailPage = () => {
                         )}
 
                         {/* Available Colors */}
-                        {product.colors && product.colors.length > 0 && (
+                        {productColors.length > 0 && (
                             <div className="mb-6">
                                 <label className="block text-sm font-semibold text-gray-900 mb-3">
                                     Available Colors
                                 </label>
                                 <div className="flex flex-wrap gap-2">
-                                    {product.colors.map((color) => (
+                                    {productColors.map((color) => (
                                         <button
                                             key={color}
                                             onClick={() => setSelectedColor(color)}
@@ -159,11 +170,11 @@ const ProductDetailPage = () => {
                                 variant="primary"
                                 className="w-full"
                                 onClick={() => {
-                                    if (!selectedSize && product.sizes?.length > 0) {
+                                    if (!selectedSize && productSizes.length > 0) {
                                         alert('사이즈를 선택해주세요.');
                                         return;
                                     }
-                                    if (!selectedColor && product.colors?.length > 0) {
+                                    if (!selectedColor && productColors.length > 0) {
                                         alert('컬러를 선택해주세요.');
                                         return;
                                     }
