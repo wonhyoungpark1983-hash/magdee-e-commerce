@@ -6,7 +6,18 @@ import Input from './Input';
 
 import { useProducts } from '../context/ProductContext';
 
-const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, initialColor }) => {
+const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, initialColor, initialQuantity }) => {
+    // Safety check: Don't render if product is missing
+    if (isOpen && !product) {
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+                    <p className="text-gray-600 mb-4">상품 정보를 불러올 수 없습니다.</p>
+                    <Button onClick={onClose}>닫기</Button>
+                </div>
+            </div>
+        );
+    }
     const { createOrder } = useProducts();
     const [orderResult, setOrderResult] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -136,9 +147,9 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                                 className="w-16 h-16 object-cover rounded-lg"
                             />
                             <div>
-                                <h4 className="font-semibold text-gray-900">{product.name}</h4>
-                                <p className="text-sm text-gray-600">{product.brand}</p>
-                                <p className="font-bold text-primary">₩{product.price.toLocaleString()}</p>
+                                <h4 className="font-semibold text-gray-900">{product?.name || '상품명 없음'}</h4>
+                                <p className="text-sm text-gray-600">{product?.brand || ''}</p>
+                                <p className="font-bold text-primary">₩{(product?.price || 0).toLocaleString()}</p>
                             </div>
                         </div>
 
