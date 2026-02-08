@@ -738,7 +738,7 @@ const AdminDashboard = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <Button size="sm" variant="secondary">View</Button>
+                                                    <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handleOrderClick(order); }}>View</Button>
                                                 </td>
                                             </tr>
                                         ))}
