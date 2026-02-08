@@ -70,11 +70,6 @@ const ProductDetailPage = () => {
                         <p className="text-3xl font-bold text-gray-900 mb-4">
                             ₩{product.price.toLocaleString()}
                         </p>
-                        {product.stock > 0 && (
-                            <p className={`text-sm font-semibold mb-6 ${stockColor}`}>
-                                {stockStatus} ({product.stock} items)
-                            </p>
-                        )}
 
                         <div className="mb-6">
                             <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
@@ -107,7 +102,7 @@ const ProductDetailPage = () => {
 
                         {/* Available Colors */}
                         {product.colors && product.colors.length > 0 && (
-                            <div className="mb-8">
+                            <div className="mb-6">
                                 <label className="block text-sm font-semibold text-gray-900 mb-3">
                                     Available Colors
                                 </label>
@@ -128,6 +123,13 @@ const ProductDetailPage = () => {
                             </div>
                         )}
 
+                        {/* Stock Status */}
+                        {product.stock > 0 && (
+                            <p className={`text-sm font-semibold mb-6 ${stockColor}`}>
+                                {stockStatus} ({product.stock} items)
+                            </p>
+                        )}
+
                         {/* Purchase Button */}
                         <div className="space-y-3 mb-8">
                             <Button
@@ -146,7 +148,7 @@ const ProductDetailPage = () => {
                                 }}
                             >
                                 <Send className="mr-2" size={20} />
-                                주문하기
+                                구매하기
                             </Button>
                             <p className="text-sm text-gray-500 text-center">
                                 실시간 주문 현황은 내 주문 페이지에서 확인 가능합니다
