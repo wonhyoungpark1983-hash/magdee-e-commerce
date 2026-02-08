@@ -825,7 +825,7 @@ const AdminDashboard = () => {
 
             {/* Sidebar */}
             <div className={`fixed left-0 top-0 h-full w-64 bg-primary text-white p-6 transform transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-                <h1 className="font-heading text-2xl font-bold mb-8 mt-12 lg:mt-0">MAGDEE</h1>
+                <h1 className="font-heading text-2xl font-bold mb-8 mt-12 lg:mt-0">MAGDEE <span className="text-xs font-normal opacity-70">v1.1</span></h1>
                 <nav className="space-y-2">
                     <button
                         onClick={() => { setActiveView('orders'); setMobileMenuOpen(false); }}
