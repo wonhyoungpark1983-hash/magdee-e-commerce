@@ -40,7 +40,7 @@ const AdminDashboard = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const productData = {
@@ -55,22 +55,32 @@ const AdminDashboard = () => {
             colors: formData.colors.split(',').map(c => c.trim()).filter(c => c !== ''),
         };
 
-        if (editingProduct) {
-            updateProduct(editingProduct.id, productData);
-            alert('Product updated successfully!');
-        } else {
-            addProduct({
-                ...productData,
-                isFeatured: false,
-                isBestSeller: false,
-                badge: 'NEW',
-            });
-            alert('Product added successfully!');
-        }
+        try {
+            if (editingProduct) {
+                await updateProduct(editingProduct.id, productData);
+                alert('Product updated successfully!');
+            } else {
+                const result = await addProduct({
+                    ...productData,
+                    isFeatured: false,
+                    isBestSeller: false,
+                });
 
-        setShowModal(false);
-        setEditingProduct(null);
-        resetForm();
+                if (result) {
+                    alert('Product added successfully!');
+                } else {
+                    alert('Failed to add product. Please check your database connection or console.');
+                    return; // Don't close modal if it failed
+                }
+            }
+
+            setShowModal(false);
+            setEditingProduct(null);
+            resetForm();
+        } catch (error) {
+            console.error('Submit error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
     };
 
     const handleEdit = (product) => {
@@ -89,9 +99,9 @@ const AdminDashboard = () => {
         setShowModal(true);
     };
 
-    const handleDelete = (productId) => {
+    const handleDelete = async (productId) => {
         if (confirm('Are you sure you want to delete this product?')) {
-            deleteProduct(productId);
+            await deleteProduct(productId);
             alert('Product deleted successfully!');
         }
     };
