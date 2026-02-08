@@ -111,12 +111,14 @@ const HomePage = () => {
                     alt="MAGDEE Brand Story"
                     className="w-full h-full object-cover opacity-40"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-[2px]">
-                    <div className="text-center px-4">
-                        <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 mb-4 bg-white/60 inline-block px-4 py-2 rounded-lg">
-                            Curated Fashion for Modern Lifestyle
+                <div className="absolute inset-0 flex items-center justify-center p-6 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-[6px]">
+                    <div className="text-center bg-white/30 backdrop-blur-xl border border-white/40 p-10 md:p-16 rounded-[2rem] shadow-2xl max-w-4xl mx-auto transform transition-all hover:scale-[1.01]">
+                        <h2 className="font-heading text-3xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight leading-tight">
+                            Curated Fashion for <br />
+                            <span className="text-primary italic font-serif">Modern Lifestyle</span>
                         </h2>
-                        <p className="text-xl text-gray-800 font-medium max-w-2xl mx-auto bg-white/40 p-3 rounded-lg mt-4 shadow-sm">
+                        <div className="w-24 h-1 bg-primary mx-auto mb-8 rounded-full"></div>
+                        <p className="text-lg md:text-2xl text-gray-800 font-medium max-w-2xl mx-auto leading-relaxed">
                             Discover timeless pieces that blend contemporary design with exceptional quality.
                         </p>
                     </div>
