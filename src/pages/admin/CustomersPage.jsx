@@ -5,11 +5,36 @@ import { customers as mockCustomers } from '../../data/mockData';
 
 const CustomersPage = () => {
     const navigate = useNavigate();
-    const [customers, setCustomers] = useState(mockCustomers);
-    const [filteredCustomers, setFilteredCustomers] = useState(mockCustomers);
+    const { orders, loading } = useProducts();
+    const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Derive customers from orders
+    const customers = orders.reduce((acc, order) => {
+        const existing = acc.find(c => c.phone === order.customer_phone);
+        if (existing) {
+            existing.totalSpent += order.price || 0;
+            existing.orderCount += 1;
+            if (new Date(order.created_at) > new Date(existing.lastOrder)) {
+                existing.lastOrder = order.created_at;
+            }
+        } else {
+            acc.push({
+                id: order.id,
+                name: order.customer_name,
+                phone: order.customer_phone,
+                totalSpent: order.price || 0,
+                orderCount: 1,
+                lastOrder: order.created_at,
+                address: order.address,
+                // Status mapping for visual variety (mocked for now but based on data)
+                status: (order.price > 1000000) ? 'VIP' : 'Regular'
+            });
+        }
+        return acc;
+    }, []);
 
     useEffect(() => {
         const isAuth = localStorage.getItem('isAdminAuthenticated');
@@ -28,12 +53,12 @@ const CustomersPage = () => {
         if (searchTerm) {
             filtered = filtered.filter(customer =>
                 customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+                customer.phone.includes(searchTerm)
             );
         }
 
         setFilteredCustomers(filtered);
-    }, [selectedStatus, searchTerm, customers]);
+    }, [selectedStatus, searchTerm, orders]);
 
     const handleLogout = () => {
         localStorage.removeItem('isAdminAuthenticated');
@@ -142,8 +167,8 @@ const CustomersPage = () => {
                                         key={status}
                                         onClick={() => setSelectedStatus(status)}
                                         className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition ${selectedStatus === status
-                                                ? 'bg-primary text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-primary text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
                                         {status === 'all' ? '전체' : status}

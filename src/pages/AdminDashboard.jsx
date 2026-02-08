@@ -8,8 +8,8 @@ import { useProducts } from '../context/ProductContext';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { products, orders, addProduct, updateProduct, deleteProduct, toggleFeatured, toggleBestSeller, updateOrderStatus } = useProducts();
-    const [activeView, setActiveView] = useState('products'); // 'products' or 'orders'
+    const { products, orders, loading, addProduct, updateProduct, deleteProduct, toggleFeatured, toggleBestSeller, updateOrderStatus } = useProducts();
+    const [activeView, setActiveView] = useState('orders'); // Default to orders for better overview
     const [orderFilter, setOrderFilter] = useState('ALL'); // 'ALL', 'PENDING', 'SHIPPED', etc.
     const [showModal, setShowModal] = useState(false);
     const [showOrderModal, setShowOrderModal] = useState(false);
@@ -138,6 +138,16 @@ const AdminDashboard = () => {
         });
     };
 
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'PENDING': return 'Awaiting Payment';
+            case 'SHIPPED': return 'Shipped';
+            case 'COMPLETED': return 'Completed';
+            case 'CANCELLED': return 'Cancelled';
+            default: return status;
+        }
+    };
+
     // Calculate Stats
     const stats = {
         totalRevenue: orders.filter(o => o.status !== 'CANCELLED').reduce((sum, o) => sum + (o.price || 0), 0),
@@ -198,50 +208,57 @@ const AdminDashboard = () => {
             {/* Main Content */}
             <div className="lg:ml-64 p-4 lg:p-8">
                 {/* Summary Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-12 lg:mt-0">
-                    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="p-2 bg-green-50 text-green-600 rounded-lg">
-                                <DollarSign size={20} />
+                {!loading && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-12 lg:mt-0">
+                        <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="p-2 bg-green-50 text-green-600 rounded-lg">
+                                    <DollarSign size={20} />
+                                </div>
+                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">+12%</span>
                             </div>
-                            <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">+12%</span>
+                            <p className="text-sm text-gray-500 font-medium">Total Revenue</p>
+                            <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">₩{stats.totalRevenue.toLocaleString()}</h4>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">Total Revenue</p>
-                        <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">₩{stats.totalRevenue.toLocaleString()}</h4>
-                    </div>
-                    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                                <ShoppingBag size={20} />
+                        <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                    <ShoppingBag size={20} />
+                                </div>
+                                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Today</span>
                             </div>
-                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Today</span>
+                            <p className="text-sm text-gray-500 font-medium">New Orders</p>
+                            <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.todayOrders} EA</h4>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">New Orders</p>
-                        <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.todayOrders} 건</h4>
-                    </div>
-                    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                                <Clock size={20} />
+                        <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                                    <Clock size={20} />
+                                </div>
+                                <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Wait</span>
                             </div>
-                            <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Wait</span>
+                            <p className="text-sm text-gray-500 font-medium">Awaiting Payment</p>
+                            <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.pendingOrders} EA</h4>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">Pending</p>
-                        <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.pendingOrders} 건</h4>
-                    </div>
-                    <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
-                                <TrendingUp size={20} />
+                        <div className="bg-white p-4 lg:p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                                    <TrendingUp size={20} />
+                                </div>
+                                <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">Total</span>
                             </div>
-                            <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">Total</span>
+                            <p className="text-sm text-gray-500 font-medium">Total Orders</p>
+                            <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.totalOrders} EA</h4>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium">Total Orders</p>
-                        <h4 className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stats.totalOrders} 건</h4>
                     </div>
-                </div>
+                )}
 
-                {activeView === 'products' ? (
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20 mt-12 lg:mt-0">
+                        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p className="text-gray-500 font-medium animate-pulse">Loading data...</p>
+                    </div>
+                ) : activeView === 'products' ? (
                     <>
                         {/* Top Bar */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 lg:mb-8 mt-16 lg:mt-0">
@@ -472,10 +489,10 @@ const AdminDashboard = () => {
                                                                         order.status === 'COMPLETED' ? 'bg-green-100 text-green-600' :
                                                                             'bg-red-100 text-red-600'}`}
                                                         >
-                                                            <option value="PENDING">PENDING</option>
-                                                            <option value="SHIPPED">SHIPPED</option>
-                                                            <option value="COMPLETED">COMPLETED</option>
-                                                            <option value="CANCELLED">CANCELLED</option>
+                                                            <option value="PENDING">Awaiting Payment</option>
+                                                            <option value="SHIPPED">Shipped</option>
+                                                            <option value="COMPLETED">Completed</option>
+                                                            <option value="CANCELLED">Cancelled</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -507,10 +524,10 @@ const AdminDashboard = () => {
                                                         order.status === 'COMPLETED' ? 'bg-green-100 text-green-600' :
                                                             'bg-red-100 text-red-600'}`}
                                         >
-                                            <option value="PENDING">PENDING</option>
-                                            <option value="SHIPPED">SHIPPED</option>
-                                            <option value="COMPLETED">COMPLETED</option>
-                                            <option value="CANCELLED">CANCELLED</option>
+                                            <option value="PENDING">Awaiting Payment</option>
+                                            <option value="SHIPPED">Shipped</option>
+                                            <option value="COMPLETED">Completed</option>
+                                            <option value="CANCELLED">Cancelled</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">

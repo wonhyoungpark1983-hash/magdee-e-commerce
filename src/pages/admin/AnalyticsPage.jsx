@@ -5,8 +5,62 @@ import { analytics as mockAnalytics } from '../../data/mockData';
 
 const AnalyticsPage = () => {
     const navigate = useNavigate();
+    const { orders, loading } = useProducts();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const analytics = mockAnalytics;
+
+    // Dynamic calculations based on real orders
+    const analyticsData = () => {
+        const totalRevenue = orders.reduce((sum, order) => sum + (order.price || 0), 0);
+        const totalOrders = orders.length;
+
+        // Count unique customers
+        const uniqueCustomers = new Set(orders.map(o => o.customer_phone)).size;
+
+        const avgOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+
+        // Sales trend (last 7 days)
+        const salesTrend = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            const dailyRevenue = orders
+                .filter(o => o.created_at.startsWith(dateStr))
+                .reduce((sum, o) => sum + (o.price || 0), 0);
+            salesTrend.push({ date: dateStr, revenue: dailyRevenue });
+        }
+
+        // Top products
+        const productStats = orders.reduce((acc, order) => {
+            const name = order.product_name || 'Unknown Product';
+            if (!acc[name]) {
+                acc[name] = { productName: name, sales: 0, revenue: 0 };
+            }
+            acc[name].sales += (order.quantity || 1);
+            acc[name].revenue += (order.price || 0);
+            return acc;
+        }, {});
+
+        const topProducts = Object.values(productStats)
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 5);
+
+        // Recent activity
+        const recentActivity = orders.slice(0, 5).map(order => ({
+            type: 'order',
+            message: `${order.customer_name}님이 새로운 주문을 하셨습니다.`,
+            time: new Date(order.created_at).toLocaleString()
+        }));
+
+        return {
+            overview: { totalRevenue, totalOrders, totalCustomers: uniqueCustomers, avgOrderValue },
+            salesTrend,
+            topProducts,
+            recentActivity
+        };
+    };
+
+    const stats = analyticsData();
 
     useEffect(() => {
         const isAuth = localStorage.getItem('isAdminAuthenticated');
@@ -21,173 +75,198 @@ const AnalyticsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Mobile Menu Button */}
-            <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-lg"
-            >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+        <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+            {/* Mobile Header */}
+            <div className="lg:hidden bg-primary text-white p-4 flex items-center justify-between sticky top-0 z-50">
+                <h1 className="font-heading text-xl font-bold">MAGDEE ADMIN</h1>
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
+                    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+            </div>
+
+            {/* Sidebar Overlay */}
+            {mobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
 
             {/* Sidebar */}
-            <div className={`fixed left-0 top-0 h-full w-64 bg-primary text-white p-6 transform transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-                <h1 className="font-heading text-2xl font-bold mb-8 mt-12 lg:mt-0">MAGDEE</h1>
-                <nav className="space-y-2">
-                    <Link to="/admin/dashboard" className="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition">
-                        Products
+            <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-primary text-white p-6 transform transition-transform duration-300 z-50 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
+                <h1 className="font-heading text-2xl font-bold mb-10 hidden lg:block">MAGDEE</h1>
+                <nav className="space-y-2 flex-grow">
+                    <Link to="/admin/dashboard" className="flex items-center gap-3 py-3 px-4 hover:bg-white/10 rounded-xl transition-all">
+                        <ShoppingCart size={20} />
+                        <span className="font-medium">Orders & Products</span>
                     </Link>
-                    <Link to="/admin/dashboard/orders" className="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition">
-                        Orders
+                    <Link to="/admin/dashboard/customers" className="flex items-center gap-3 py-3 px-4 hover:bg-white/10 rounded-xl transition-all">
+                        <Users size={20} />
+                        <span className="font-medium">Customers</span>
                     </Link>
-                    <Link to="/admin/dashboard/customers" className="block py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition">
-                        Customers
-                    </Link>
-                    <Link to="/admin/dashboard/analytics" className="block py-2 px-4 bg-white bg-opacity-10 rounded-lg font-medium">
-                        Analytics
+                    <Link to="/admin/dashboard/analytics" className="flex items-center gap-3 py-3 px-4 bg-white/10 rounded-xl transition-all">
+                        <TrendingUp size={20} />
+                        <span className="font-bold">Analytics</span>
                     </Link>
                 </nav>
                 <button
                     onClick={handleLogout}
-                    className="absolute bottom-6 left-6 right-6 flex items-center justify-center py-2 px-4 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg transition"
+                    className="mt-auto flex items-center justify-center gap-2 py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-200 rounded-xl transition-all border border-red-500/20"
                 >
-                    <LogOut size={18} className="mr-2" />
-                    Logout
+                    <LogOut size={18} />
+                    <span className="font-bold">Logout</span>
                 </button>
-            </div>
+            </aside>
 
             {/* Main Content */}
-            <div className="lg:ml-64 p-4 lg:p-8">
-                <div className="mt-16 lg:mt-0">
+            <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+                <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="mb-6 lg:mb-8">
-                        <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Analytics</h2>
-                        <p className="text-gray-600 mt-1 text-sm lg:text-base">Business performance overview</p>
+                    <div className="mb-8">
+                        <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Analytics Dashboard</h2>
+                        <p className="text-gray-500 mt-1 font-medium">Real-time business performance metrics</p>
                     </div>
 
-                    {/* Overview Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-gray-600 text-sm">Total Revenue</p>
-                                <div className="p-2 bg-green-100 rounded-lg">
-                                    <DollarSign size={20} className="text-green-600" />
-                                </div>
-                            </div>
-                            <p className="text-2xl lg:text-3xl font-bold text-gray-900">₩{analytics.overview.totalRevenue.toLocaleString()}</p>
-                            <p className="text-xs text-green-600 mt-1">+12.5% from last month</p>
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p className="text-gray-500 font-medium">Calculating analytics data...</p>
                         </div>
-
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-gray-600 text-sm">Total Orders</p>
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <ShoppingCart size={20} className="text-blue-600" />
-                                </div>
+                    ) : (
+                        <>
+                            {/* Overview Stats */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <AnalyticsCard
+                                    label="Total Revenue"
+                                    value={`₩${stats.overview.totalRevenue.toLocaleString()}`}
+                                    icon={<DollarSign className="text-green-600" />}
+                                    bgColor="bg-green-50"
+                                    accentColor="text-green-600"
+                                />
+                                <AnalyticsCard
+                                    label="Total Orders"
+                                    value={stats.overview.totalOrders}
+                                    icon={<ShoppingCart className="text-blue-600" />}
+                                    bgColor="bg-blue-50"
+                                    accentColor="text-blue-600"
+                                />
+                                <AnalyticsCard
+                                    label="Active Customers"
+                                    value={stats.overview.totalCustomers}
+                                    icon={<Users className="text-purple-600" />}
+                                    bgColor="bg-purple-50"
+                                    accentColor="text-purple-600"
+                                />
+                                <AnalyticsCard
+                                    label="Average Order"
+                                    value={`₩${stats.overview.avgOrderValue.toLocaleString()}`}
+                                    icon={<TrendingUp className="text-orange-600" />}
+                                    bgColor="bg-orange-50"
+                                    accentColor="text-orange-600"
+                                />
                             </div>
-                            <p className="text-2xl lg:text-3xl font-bold text-gray-900">{analytics.overview.totalOrders}</p>
-                            <p className="text-xs text-blue-600 mt-1">+8.3% from last month</p>
-                        </div>
 
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-gray-600 text-sm">Total Customers</p>
-                                <div className="p-2 bg-purple-100 rounded-lg">
-                                    <Users size={20} className="text-purple-600" />
-                                </div>
-                            </div>
-                            <p className="text-2xl lg:text-3xl font-bold text-gray-900">{analytics.overview.totalCustomers}</p>
-                            <p className="text-xs text-purple-600 mt-1">+15.2% from last month</p>
-                        </div>
-
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-gray-600 text-sm">Avg. Order Value</p>
-                                <div className="p-2 bg-orange-100 rounded-lg">
-                                    <TrendingUp size={20} className="text-orange-600" />
-                                </div>
-                            </div>
-                            <p className="text-2xl lg:text-3xl font-bold text-gray-900">₩{analytics.overview.avgOrderValue.toLocaleString()}</p>
-                            <p className="text-xs text-orange-600 mt-1">+3.7% from last month</p>
-                        </div>
-                    </div>
-
-                    {/* Sales Trend */}
-                    <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6 mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Sales Trend (Last 9 Days)</h3>
-                        <div className="overflow-x-auto">
-                            <div className="min-w-[500px]">
-                                <div className="flex items-end justify-between h-64 space-x-2">
-                                    {analytics.salesTrend.map((day, index) => {
-                                        const maxRevenue = Math.max(...analytics.salesTrend.map(d => d.revenue));
-                                        const height = (day.revenue / maxRevenue) * 100;
-                                        return (
-                                            <div key={index} className="flex-1 flex flex-col items-center">
-                                                <div className="w-full bg-primary rounded-t-lg transition-all hover:bg-opacity-80 cursor-pointer relative group" style={{ height: `${height}%` }}>
-                                                    <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                                        ₩{day.revenue.toLocaleString()}
-                                                    </div>
-                                                </div>
-                                                <p className="text-xs text-gray-600 mt-2 text-center">{day.date.slice(5)}</p>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Sales Trend */}
+                                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <h3 className="text-lg font-bold text-gray-900">Sales Velocity (Last 7 Days)</h3>
+                                        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-400">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-3 h-3 bg-primary rounded-full"></div>
+                                                <span>Revenue</span>
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+                                    </div>
+                                    <div className="h-72 flex items-end gap-3 lg:gap-6">
+                                        {stats.salesTrend.map((day, idx) => {
+                                            const maxVal = Math.max(...stats.salesTrend.map(d => d.revenue), 1);
+                                            const height = (day.revenue / maxVal) * 100;
+                                            return (
+                                                <div key={idx} className="flex-1 flex flex-col items-center group">
+                                                    <div
+                                                        className="w-full bg-primary/20 hover:bg-primary transition-all duration-500 rounded-t-xl relative cursor-help"
+                                                        style={{ height: `${Math.max(height, 5)}%` }}
+                                                    >
+                                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-xl">
+                                                            ₩{day.revenue.toLocaleString()}
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-gray-400 mt-4 uppercase tracking-tighter">
+                                                        {day.date.split('-').slice(1).join('/')}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Top Products */}
+                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                                    <h3 className="text-lg font-bold text-gray-900 mb-6">Top Performing</h3>
+                                    <div className="space-y-5">
+                                        {stats.topProducts.map((product, idx) => (
+                                            <div key={idx} className="flex items-center gap-4 group">
+                                                <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center font-black text-gray-400 text-xs border border-gray-100 group-hover:bg-primary group-hover:text-white transition-all">
+                                                    {idx + 1}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="font-bold text-gray-900 text-sm truncate">{product.productName}</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{product.sales} Sales</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-primary text-sm">₩{product.revenue.toLocaleString()}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {stats.topProducts.length === 0 && (
+                                            <div className="py-10 text-center text-gray-400 font-medium">데이터가 없습니다.</div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Top Products */}
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Top Products</h3>
-                            <div className="space-y-3">
-                                {analytics.topProducts.map((product, index) => (
-                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex-1">
-                                            <p className="font-medium text-gray-900 text-sm">{product.productName}</p>
-                                            <p className="text-xs text-gray-600">{product.sales} sales</p>
+                            {/* Recent Activity */}
+                            <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-10">
+                                <h3 className="text-lg font-bold text-gray-900 mb-6">Live Activity Feed</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {stats.recentActivity.map((activity, idx) => (
+                                        <div key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                            <div className="p-2.5 bg-white rounded-xl shadow-sm border border-gray-50 text-blue-600">
+                                                <ShoppingCart size={18} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-gray-900 leading-snug">{activity.message}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 mt-2 uppercase flex items-center gap-1.5">
+                                                    <TrendingUp size={10} />
+                                                    {activity.time}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <p className="font-bold text-gray-900">₩{product.revenue.toLocaleString()}</p>
-                                    </div>
-                                ))}
+                                    ))}
+                                    {stats.recentActivity.length === 0 && (
+                                        <div className="col-span-full py-10 text-center text-gray-400 font-medium font-bold uppercase tracking-widest text-xs">No Recent Activity Detected</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Recent Activity */}
-                        <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
-                            <div className="space-y-3">
-                                {analytics.recentActivity.map((activity, index) => (
-                                    <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                                        <div className={`p-2 rounded-lg ${activity.type === 'order' ? 'bg-blue-100' : 'bg-green-100'}`}>
-                                            {activity.type === 'order' ? (
-                                                <ShoppingCart size={16} className="text-blue-600" />
-                                            ) : (
-                                                <Users size={16} className="text-green-600" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm text-gray-900">{activity.message}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </div>
-            </div>
-
-            {/* Overlay for mobile menu */}
-            {mobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-                    onClick={() => setMobileMenuOpen(false)}
-                />
-            )}
+            </main>
         </div>
     );
 };
+
+const AnalyticsCard = ({ label, value, icon, bgColor, accentColor }) => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 transition-all hover:shadow-md">
+        <div className={`p-3.5 ${bgColor} rounded-2xl shadow-sm border border-white/50`}>
+            {icon}
+        </div>
+        <div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
+            <p className={`text-2xl font-black text-gray-900 tracking-tight`}>{value}</p>
+        </div>
+    </div>
+);
 
 export default AnalyticsPage;

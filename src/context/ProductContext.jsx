@@ -187,6 +187,9 @@ export const ProductProvider = ({ children }) => {
     };
 
     const updateOrderStatus = async (orderId, status) => {
+        // Optimistic update
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+
         const { error } = await supabase
             .from('orders')
             .update({ status })
@@ -194,6 +197,9 @@ export const ProductProvider = ({ children }) => {
 
         if (error) {
             console.error('Error updating order status:', error.message);
+            // Revert on error - re-fetch from supabase to be safe
+            const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+            if (data) setOrders(data);
         }
     };
 
