@@ -9,9 +9,6 @@ const Navbar = () => {
     const location = useLocation();
 
     const menuItems = [
-        { name: 'NEW', path: '/new' },
-        { name: 'WOMEN', path: '/women' },
-        { name: 'MEN', path: '/men' },
         { name: 'MY ORDERS', path: '/my-orders' },
     ];
 
