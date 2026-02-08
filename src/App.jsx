@@ -10,6 +10,7 @@ import OrdersPage from './pages/admin/OrdersPage';
 import CustomersPage from './pages/admin/CustomersPage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 
 function App() {
   return (
@@ -57,6 +58,12 @@ function App() {
             <>
               <Navbar />
               <ProductsPage />
+            </>
+          } />
+          <Route path="/my-orders" element={
+            <>
+              <Navbar />
+              <MyOrdersPage />
             </>
           } />
 

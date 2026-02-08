@@ -14,6 +14,7 @@ export const useProducts = () => {
 
 export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [settings, setSettings] = useState({
         adminPhone: '',
         adminEmail: '',
@@ -35,6 +36,15 @@ export const ProductProvider = ({ children }) => {
 
                 if (productsError) throw productsError;
                 if (productsData) setProducts(productsData);
+
+                // Fetch Orders
+                const { data: ordersData, error: ordersError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (ordersError) throw ordersError;
+                if (ordersData) setOrders(ordersData);
 
                 // Fetch Settings
                 const { data: settingsData, error: settingsError } = await supabase
@@ -78,9 +88,23 @@ export const ProductProvider = ({ children }) => {
             })
             .subscribe();
 
+        const ordersChannel = supabase
+            .channel('public:orders')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+                if (payload.eventType === 'INSERT') {
+                    setOrders(prev => [payload.new, ...prev]);
+                } else if (payload.eventType === 'UPDATE') {
+                    setOrders(prev => prev.map(o => o.id === payload.new.id ? payload.new : o));
+                } else if (payload.eventType === 'DELETE') {
+                    setOrders(prev => prev.filter(o => o.id !== payload.old.id));
+                }
+            })
+            .subscribe();
+
         return () => {
             supabase.removeChannel(productsChannel);
             supabase.removeChannel(settingsChannel);
+            supabase.removeChannel(ordersChannel);
         };
     }, []);
 
@@ -147,8 +171,37 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
+    const createOrder = async (orderData) => {
+        const { data, error } = await supabase
+            .from('orders')
+            .insert([orderData])
+            .select();
+
+        if (error) {
+            console.error('Error creating order:', error.message);
+            return null;
+        }
+        return data[0];
+    };
+
+    const updateOrderStatus = async (orderId, status) => {
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', orderId);
+
+        if (error) {
+            console.error('Error updating order status:', error.message);
+        }
+    };
+
+    const getOrdersByPhone = (phone) => {
+        return orders.filter(order => order.customer_phone === phone);
+    };
+
     const value = {
         products,
+        orders,
         settings,
         loading,
         addProduct,
@@ -157,6 +210,9 @@ export const ProductProvider = ({ children }) => {
         toggleFeatured,
         toggleBestSeller,
         updateSettings,
+        createOrder,
+        updateOrderStatus,
+        getOrdersByPhone,
     };
 
     return (

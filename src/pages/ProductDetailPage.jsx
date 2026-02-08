@@ -7,16 +7,31 @@ import { useProducts } from '../context/ProductContext';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
-    const { products, settings } = useProducts();
-    const product = products.find(p => p.id === parseInt(id));
+    const { products, settings, loading } = useProducts();
+    const product = products.find(p => String(p.id) === String(id));
 
     const [showPurchaseModal, setShowPurchaseModal] = useState(false);
     const [showDescription, setShowDescription] = useState(true);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-500 font-medium">Loading product details...</p>
+            </div>
+        );
+    }
+
     if (!product) {
-        return <div className="min-h-screen flex items-center justify-center">Product not found</div>;
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Product not found</h2>
+                <p className="text-gray-600 mb-6 text-center">The product you are looking for might have been removed or the link is incorrect.</p>
+                <Button onClick={() => window.history.back()}>Go Back</Button>
+            </div>
+        );
     }
 
     const stockStatus = product.stock > 10 ? 'In Stock' : 'Low Stock';

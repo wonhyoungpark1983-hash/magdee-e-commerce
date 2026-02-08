@@ -4,13 +4,11 @@ import { X, Send } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
 
+import { useProducts } from '../context/ProductContext';
+
 const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, initialColor }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        selectedSize: initialSize || product.sizes?.[0] || '',
-        selectedColor: initialColor || product.colors?.[0] || '',
-    });
+    const { createOrder } = useProducts();
+    const [orderResult, setOrderResult] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -19,6 +17,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                 selectedSize: initialSize || product.sizes?.[0] || '',
                 selectedColor: initialColor || product.colors?.[0] || '',
             }));
+            setOrderResult(null); // Reset result when opening
         }
     }, [isOpen, initialSize, initialColor, product]);
 
@@ -29,31 +28,45 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        // Format WhatsApp message
-        const message = `[MAGDEE 구매 요청]
-고객명: ${formData.name}
-연락처: ${formData.phone}
-제품: ${product.name}
-브랜드: ${product.brand}
-사이즈: ${formData.selectedSize}
-컬러: ${formData.selectedColor}
-가격: ₩${product.price.toLocaleString()}`;
+        const orderData = {
+            product_id: product.id,
+            product_name: product.name,
+            customer_name: formData.name,
+            customer_phone: formData.phone,
+            address: formData.address,
+            size: formData.selectedSize,
+            color: formData.selectedColor,
+            quantity: 1,
+            status: 'PENDING',
+            price: product.price // Save price at order time
+        };
 
-        // Encode message for URL
-        const encodedMessage = encodeURIComponent(message);
+        try {
+            // 1. Save to Supabase
+            const result = await createOrder(orderData);
 
-        // Create WhatsApp URL (remove any non-numeric characters from phone)
-        const cleanPhone = adminPhone.replace(/[^0-9]/g, '');
-        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+            if (!result) {
+                alert('주문 저장에 실패했습니다. 다시 시도해 주세요.');
+                setLoading(false);
+                return;
+            }
 
-        // Open WhatsApp
-        window.open(whatsappUrl, '_blank');
+            // 2. Set success state instead of WhatsApp redirect
+            setOrderResult(result);
 
-        // Close modal
-        onClose();
+            // Store phone in localStorage for easy lookup later
+            localStorage.setItem('magdee_last_phone', formData.phone);
+
+        } catch (error) {
+            console.error('Order submission error:', error);
+            alert('주문 처리 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -69,96 +82,141 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {/* Product Info */}
-                    <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded-lg"
-                        />
-                        <div>
-                            <h4 className="font-semibold text-gray-900">{product.name}</h4>
-                            <p className="text-sm text-gray-600">{product.brand}</p>
-                            <p className="font-bold text-primary">₩{product.price.toLocaleString()}</p>
+                {orderResult ? (
+                    <div className="p-8 text-center space-y-6">
+                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Send size={40} />
                         </div>
-                    </div>
-
-                    {/* Customer Info */}
-                    <Input
-                        label="이름"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="홍길동"
-                        required
-                    />
-
-                    <Input
-                        label="연락처"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="010-1234-5678"
-                        required
-                    />
-
-                    {/* Size Selection */}
-                    {product.sizes && product.sizes.length > 0 && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                사이즈 <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                name="selectedSize"
-                                value={formData.selectedSize}
-                                onChange={handleInputChange}
-                                className="input-field w-full"
-                                required
-                            >
-                                {product.sizes.map((size) => (
-                                    <option key={size} value={size}>{size}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    {/* Color Selection */}
-                    {product.colors && product.colors.length > 0 && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                컬러 <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                name="selectedColor"
-                                value={formData.selectedColor}
-                                onChange={handleInputChange}
-                                className="input-field w-full"
-                                required
-                            >
-                                {product.colors.map((color) => (
-                                    <option key={color} value={color}>{color}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    {/* Submit Button */}
-                    <div className="pt-4">
-                        <Button
-                            type="submit"
-                            variant="accent"
-                            className="w-full flex items-center justify-center"
-                        >
-                            <Send size={18} className="mr-2" />
-                            왓츠앱으로 구매 요청
-                        </Button>
-                        <p className="text-xs text-gray-500 text-center mt-2">
-                            왓츠앱이 열리면서 구매 요청 메시지가 전송됩니다
+                        <h3 className="text-2xl font-bold text-gray-900">주문이 완료되었습니다!</h3>
+                        <p className="text-gray-600">
+                            주문해 주셔서 감사합니다. 관리자가 확인 후 순차적으로 연락 드릴 예정입니다.
                         </p>
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-left">
+                            <p className="text-sm text-gray-500 mb-1">주문 번호</p>
+                            <p className="font-mono font-bold text-lg text-primary">{orderResult.id}</p>
+                        </div>
+                        <div className="pt-4 space-y-3">
+                            <Button
+                                variant="primary"
+                                className="w-full"
+                                onClick={() => {
+                                    onClose();
+                                    window.location.href = '/my-orders';
+                                }}
+                            >
+                                주문 내역 확인하기
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                className="w-full"
+                                onClick={onClose}
+                            >
+                                쇼핑 계속하기
+                            </Button>
+                        </div>
                     </div>
-                </form>
+                ) : (
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                        {/* Product Info */}
+                        <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-16 h-16 object-cover rounded-lg"
+                            />
+                            <div>
+                                <h4 className="font-semibold text-gray-900">{product.name}</h4>
+                                <p className="text-sm text-gray-600">{product.brand}</p>
+                                <p className="font-bold text-primary">₩{product.price.toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                        {/* Customer Info */}
+                        <Input
+                            label="이름"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            placeholder="홍길동"
+                            required
+                        />
+
+                        <Input
+                            label="연락처"
+                            name="phone"
+                            type="tel"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="010-1234-5678"
+                            required
+                        />
+
+                        <Input
+                            label="배송 주소"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            placeholder="서울특별시 강남구..."
+                            required
+                        />
+
+                        {/* Size Selection */}
+                        {product.sizes && product.sizes.length > 0 && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    사이즈 <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    name="selectedSize"
+                                    value={formData.selectedSize}
+                                    onChange={handleInputChange}
+                                    className="input-field w-full"
+                                    required
+                                >
+                                    {product.sizes.map((size) => (
+                                        <option key={size} value={size}>{size}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Color Selection */}
+                        {product.colors && product.colors.length > 0 && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    컬러 <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    name="selectedColor"
+                                    value={formData.selectedColor}
+                                    onChange={handleInputChange}
+                                    className="input-field w-full"
+                                    required
+                                >
+                                    {product.colors.map((color) => (
+                                        <option key={color} value={color}>{color}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <div className="pt-4">
+                            <Button
+                                type="submit"
+                                variant="accent"
+                                className="w-full flex items-center justify-center"
+                                disabled={loading}
+                            >
+                                <Send size={18} className="mr-2" />
+                                {loading ? '처리 중...' : '주문하기'}
+                            </Button>
+                            <p className="text-xs text-gray-500 text-center mt-2">
+                                주문 정보가 저장되며 실시간으로 확인 가능합니다
+                            </p>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );
@@ -166,7 +224,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
 
 PurchaseModal.propTypes = {
     product: PropTypes.shape({
-        id: PropTypes.number.isRequired,
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         name: PropTypes.string.isRequired,
         brand: PropTypes.string.isRequired,
         price: PropTypes.number.isRequired,

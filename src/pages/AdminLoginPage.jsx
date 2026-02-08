@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Lock, User } from 'lucide-react';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -108,9 +108,14 @@ const AdminLoginPage = () => {
                     </form>
 
                     {/* Security Message */}
-                    <p className="mt-6 text-center text-xs text-gray-500">
-                        Authorized personnel only
-                    </p>
+                    <div className="mt-6 flex flex-col items-center space-y-4">
+                        <p className="text-center text-xs text-gray-500">
+                            Authorized personnel only
+                        </p>
+                        <Link to="/" className="text-primary hover:underline font-semibold text-sm">
+                            홈페이지로 돌아가기
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

@@ -6,7 +6,16 @@ import Footer from '../components/Footer';
 import { useProducts } from '../context/ProductContext';
 
 const HomePage = () => {
-    const { products } = useProducts();
+    const { products, loading } = useProducts();
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-500 font-medium">Loading MAGDEE LUXURY...</p>
+            </div>
+        );
+    }
 
     // Filter products based on admin selection
     const newArrivals = products.filter(p => p.isFeatured);
@@ -14,7 +23,7 @@ const HomePage = () => {
 
     // If no featured products, show all products
     const hasFeatures = newArrivals.length > 0 || bestSellers.length > 0;
-    const allProducts = hasFeatures ? [] : products.slice(0, 8);
+    const allProducts = products.slice(0, 12); // Show up to 12 products on homepage
 
     return (
         <div className="min-h-screen bg-white">
@@ -77,22 +86,23 @@ const HomePage = () => {
                 </section>
             )}
 
-            {/* All Products - Show when no featured items selected */}
-            {!hasFeatures && (
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900">Our Products</h2>
-                        <Link to="/products" className="text-primary hover:underline flex items-center">
-                            View All <ArrowRight className="ml-1" size={18} />
-                        </Link>
+            {/* All Products Section - Always show this for maximum visibility of updates */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900">Our Collection</h2>
+                        <p className="text-gray-500 mt-1">Discover our latest curated pieces ({products.length})</p>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                        {allProducts.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </div>
-                </section>
-            )}
+                    <Link to="/products" className="text-primary hover:underline flex items-center">
+                        View All <ArrowRight className="ml-1" size={18} />
+                    </Link>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {allProducts.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+            </section>
 
             {/* Brand Story */}
             <section className="relative h-96 bg-secondary">
@@ -101,12 +111,12 @@ const HomePage = () => {
                     alt="MAGDEE Brand Story"
                     className="w-full h-full object-cover opacity-40"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-[2px]">
                     <div className="text-center px-4">
-                        <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                        <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 mb-4 bg-white/60 inline-block px-4 py-2 rounded-lg">
                             Curated Fashion for Modern Lifestyle
                         </h2>
-                        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+                        <p className="text-xl text-gray-800 font-medium max-w-2xl mx-auto bg-white/40 p-3 rounded-lg mt-4 shadow-sm">
                             Discover timeless pieces that blend contemporary design with exceptional quality.
                         </p>
                     </div>
