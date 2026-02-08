@@ -14,6 +14,7 @@ const ProductDetailPage = () => {
     const [showDescription, setShowDescription] = useState(true);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
+    const [quantity, setQuantity] = useState(1);
 
     if (loading) {
         return (
@@ -130,6 +131,28 @@ const ProductDetailPage = () => {
                             </p>
                         )}
 
+                        {/* Quantity Selector */}
+                        <div className="mb-8">
+                            <label className="block text-sm font-semibold text-gray-900 mb-3">
+                                Quantity
+                            </label>
+                            <div className="flex items-center space-x-4">
+                                <button
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="p-2 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                                >
+                                    <span className="text-xl font-bold">−</span>
+                                </button>
+                                <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+                                <button
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="p-2 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                                >
+                                    <span className="text-xl font-bold">+</span>
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Purchase Button */}
                         <div className="space-y-3 mb-8">
                             <Button
@@ -182,6 +205,7 @@ const ProductDetailPage = () => {
                 adminPhone={settings.adminPhone || ''}
                 initialSize={selectedSize}
                 initialColor={selectedColor}
+                initialQuantity={quantity}
             />
         </div>
     );

@@ -16,6 +16,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
         address: '',
         selectedSize: initialSize || '',
         selectedColor: initialColor || '',
+        quantity: initialQuantity || 1,
     });
 
 
@@ -25,10 +26,11 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                 ...prev,
                 selectedSize: initialSize || product.sizes?.[0] || '',
                 selectedColor: initialColor || product.colors?.[0] || '',
+                quantity: initialQuantity || 1,
             }));
             setOrderResult(null); // Reset result when opening
         }
-    }, [isOpen, initialSize, initialColor, product]);
+    }, [isOpen, initialSize, initialColor, initialQuantity, product]);
 
     if (!isOpen) return null;
 
@@ -49,7 +51,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
             address: formData.address,
             size: formData.selectedSize,
             color: formData.selectedColor,
-            quantity: 1,
+            quantity: parseInt(formData.quantity) || 1,
             status: 'PENDING',
             price: product.price // Save price at order time
         };
@@ -246,6 +248,7 @@ PurchaseModal.propTypes = {
     adminPhone: PropTypes.string.isRequired,
     initialSize: PropTypes.string,
     initialColor: PropTypes.string,
+    initialQuantity: PropTypes.number,
 };
 
 export default PurchaseModal;
