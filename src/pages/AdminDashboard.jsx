@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Plus, Edit, Trash2, LogOut, Menu, X, Star, TrendingUp, ShoppingBag, DollarSign, Clock, Search, Mail, Phone, ShoppingCart, Users, Save, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Menu, X, Star, TrendingUp, ShoppingBag, DollarSign, Clock, Search, Mail, Phone, ShoppingCart, Users, Save, Package, Printer } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { useProducts } from '../context/ProductContext';
