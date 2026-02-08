@@ -7,7 +7,8 @@ const Button = ({
     onClick,
     disabled = false,
     className = '',
-    type = 'button'
+    type = 'button',
+    ...props
 }) => {
     const baseStyles = 'font-semibold rounded-lg transition-all duration-200 inline-flex items-center justify-center';
 
@@ -31,6 +32,7 @@ const Button = ({
             onClick={onClick}
             disabled={disabled}
             className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${disabledStyles} ${className}`}
+            {...props}
         >
             {children}
         </button>
