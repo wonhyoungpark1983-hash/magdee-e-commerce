@@ -25,7 +25,7 @@ const AdminLoginPage = () => {
         setError('');
 
         // Simple mock authentication
-        if (formData.username === 'madgee' && formData.password === '1234') {
+        if (formData.username === 'madgee' && formData.password === '1230') {
             localStorage.setItem('isAdminAuthenticated', 'true');
             navigate('/admin/dashboard');
         } else {
@@ -111,13 +111,6 @@ const AdminLoginPage = () => {
                     <p className="mt-6 text-center text-xs text-gray-500">
                         Authorized personnel only
                     </p>
-
-                    {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-600 font-semibold mb-2">Demo Credentials:</p>
-                        <p className="text-xs text-gray-600">Username: <code className="bg-white px-2 py-1 rounded">madgee</code></p>
-                        <p className="text-xs text-gray-600">Password: <code className="bg-white px-2 py-1 rounded">1234</code></p>
-                    </div>
                 </div>
             </div>
         </div>
