@@ -7,8 +7,17 @@ import { useProducts } from '../context/ProductContext';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
-    const { products, settings, loading } = useProducts();
-    const product = products.find(p => String(p.id) === String(id));
+    const { products = [], settings = {}, loading } = useProducts();
+
+    // Safely find product with try-catch
+    let product = null;
+    try {
+        product = Array.isArray(products)
+            ? products.find(p => String(p.id || '').toLowerCase() === String(id || '').toLowerCase())
+            : null;
+    } catch (e) {
+        console.error("Error finding product:", e);
+    }
 
     const [showPurchaseModal, setShowPurchaseModal] = useState(false);
     const [showDescription, setShowDescription] = useState(true);
@@ -213,7 +222,7 @@ const ProductDetailPage = () => {
                 product={product}
                 isOpen={showPurchaseModal}
                 onClose={() => setShowPurchaseModal(false)}
-                adminPhone={settings.adminPhone || ''}
+                adminPhone={(settings && settings.adminPhone) || ''}
                 initialSize={selectedSize}
                 initialColor={selectedColor}
                 initialQuantity={quantity}

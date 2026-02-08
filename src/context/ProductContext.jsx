@@ -54,7 +54,9 @@ export const ProductProvider = ({ children }) => {
                     .single();
 
                 if (settingsError && settingsError.code !== 'PGRST116') throw settingsError;
-                if (settingsData) setSettings(settingsData.value);
+                if (settingsData && settingsData.value) {
+                    setSettings(prev => ({ ...prev, ...settingsData.value }));
+                }
 
             } catch (error) {
                 console.error('Error fetching data from Supabase:', error.message);
