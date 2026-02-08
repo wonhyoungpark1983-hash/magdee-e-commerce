@@ -460,6 +460,7 @@ const AdminDashboard = () => {
         image: '',
         sizes: '',
         colors: '',
+        imageType: 'url', // 'url' or 'file'
     });
 
     useEffect(() => {
@@ -559,6 +560,7 @@ const AdminDashboard = () => {
             image: product.image || '',
             sizes: product.sizes?.join(', ') || '',
             colors: product.colors?.join(', ') || '',
+            imageType: product.image?.startsWith('data:') ? 'file' : 'url',
         });
         setShowModal(true);
     };
@@ -581,6 +583,7 @@ const AdminDashboard = () => {
             image: '',
             sizes: '',
             colors: '',
+            imageType: 'url',
         });
     };
 
@@ -913,7 +916,59 @@ const AdminDashboard = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                                 <textarea name="description" value={productFormData.description} onChange={handleInputChange} rows="3" className="input-field w-full"></textarea>
                             </div>
-                            <Input label="Image URL" name="image" value={productFormData.image} onChange={handleInputChange} placeholder="https://..." required />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                                <div className="flex gap-2 mb-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setProductFormData({ ...productFormData, imageType: 'url' })}
+                                        className={`flex-1 py-1 text-sm rounded border ${productFormData.imageType !== 'file' ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-300'}`}
+                                    >
+                                        Image URL
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setProductFormData({ ...productFormData, imageType: 'file' })}
+                                        className={`flex-1 py-1 text-sm rounded border ${productFormData.imageType === 'file' ? 'bg-primary text-white border-primary' : 'bg-white text-gray-600 border-gray-300'}`}
+                                    >
+                                        Upload File
+                                    </button>
+                                </div>
+
+                                {productFormData.imageType === 'file' ? (
+                                    <div className="mt-1">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setProductFormData({ ...productFormData, image: reader.result });
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-opacity-90"
+                                        />
+                                        <p className="mt-1 text-xs text-gray-500">Select an image from your device.</p>
+                                    </div>
+                                ) : (
+                                    <Input
+                                        name="image"
+                                        value={productFormData.image}
+                                        onChange={handleInputChange}
+                                        placeholder="https://..."
+                                    />
+                                )}
+
+                                {productFormData.image && (
+                                    <div className="mt-2 p-2 border rounded-lg bg-gray-50 text-center">
+                                        <img src={productFormData.image} alt="Preview" className="max-h-40 mx-auto rounded shadow-sm" />
+                                    </div>
+                                )}
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <Input label="Sizes (comma separated)" name="sizes" value={productFormData.sizes} onChange={handleInputChange} placeholder="S, M, L" />
                                 <Input label="Colors (comma separated)" name="colors" value={productFormData.colors} onChange={handleInputChange} placeholder="Black, White" />
