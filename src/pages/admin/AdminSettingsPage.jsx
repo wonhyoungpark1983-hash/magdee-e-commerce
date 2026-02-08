@@ -94,16 +94,16 @@ const AdminSettingsPage = () => {
 
                             <div className="space-y-4">
                                 <Input
-                                    label="WhatsApp Number (International Format)"
+                                    label="Admin Phone Number"
                                     name="adminPhone"
                                     type="tel"
                                     value={formData.adminPhone}
                                     onChange={handleInputChange}
-                                    placeholder="821012345678 (without + sign)"
+                                    placeholder="010-1234-5678"
                                     required
                                 />
                                 <p className="text-sm text-gray-500 -mt-2">
-                                    Enter your WhatsApp number in international format without the + sign. Example: 821012345678 for Korea
+                                    Enter the phone number where you want to receive order inquiries.
                                 </p>
 
                                 <Input

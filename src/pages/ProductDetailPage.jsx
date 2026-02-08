@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Send } from 'lucide-react';
 import Button from '../components/Button';
 import PurchaseModal from '../components/PurchaseModal';
 import { useProducts } from '../context/ProductContext';
@@ -145,11 +145,11 @@ const ProductDetailPage = () => {
                                     setShowPurchaseModal(true);
                                 }}
                             >
-                                <MessageCircle className="mr-2" size={24} />
-                                구매/문의하기
+                                <Send className="mr-2" size={20} />
+                                주문하기
                             </Button>
                             <p className="text-sm text-gray-500 text-center">
-                                왓츠앱으로 간편하게 구매 요청하세요
+                                실시간 주문 현황은 내 주문 페이지에서 확인 가능합니다
                             </p>
                         </div>
 

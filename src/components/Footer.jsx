@@ -32,12 +32,10 @@ const Footer = () => {
                                 <div className="flex items-center space-x-2">
                                     <Phone size={16} />
                                     <a
-                                        href={`https://wa.me/${settings.adminPhone.replace(/[^0-9]/g, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                        href={`tel:${settings.adminPhone}`}
                                         className="hover:text-gray-300 transition"
                                     >
-                                        WhatsApp
+                                        {settings.adminPhone || '010-1234-5678'}
                                     </a>
                                 </div>
                             )}

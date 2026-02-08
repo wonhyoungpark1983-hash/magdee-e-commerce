@@ -9,6 +9,15 @@ import { useProducts } from '../context/ProductContext';
 const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, initialColor }) => {
     const { createOrder } = useProducts();
     const [orderResult, setOrderResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: localStorage.getItem('magdee_last_phone') || '',
+        address: '',
+        selectedSize: initialSize || '',
+        selectedColor: initialColor || '',
+    });
+
 
     useEffect(() => {
         if (isOpen) {
@@ -55,7 +64,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                 return;
             }
 
-            // 2. Set success state instead of WhatsApp redirect
+            // 2. Set success state
             setOrderResult(result);
 
             // Store phone in localStorage for easy lookup later
