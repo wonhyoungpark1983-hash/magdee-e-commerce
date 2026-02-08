@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles based on MAGDEE design system */
+@layer base {
+  body {
+    @apply font-sans text-gray-700 bg-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold text-gray-900;
+  }
+}
+
+@layer components {
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+    @apply hover:bg-gray-900 hover:-translate-y-0.5 hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent text-primary border-2 border-primary px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+    @apply hover:bg-primary hover:text-white;
+  }
+  
+  .btn-accent {
+    @apply bg-accent text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+    @apply hover:bg-opacity-90;
+  }
+  
+  /* Product Card */
+  .product-card {
+    @apply bg-white rounded-xl overflow-hidden transition-all duration-300;
+    @apply hover:-translate-y-1 hover:shadow-card-hover;
+  }
+  
+  /* Input Fields */
+  .input-field {
+    @apply border-2 border-gray-100 rounded-lg px-4 py-3 text-base transition-colors duration-200;
+    @apply focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-10;
+  }
+  
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500 focus:ring-opacity-10;
+  }
+  
+  /* Navigation */
+  .nav-link {
+    @apply text-gray-700 hover:text-primary transition-colors duration-200 font-medium;
+  }
+  
+  .nav-link-active {
+    @apply text-primary font-semibold;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
