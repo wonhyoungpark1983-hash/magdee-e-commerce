@@ -211,6 +211,38 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                             </div>
                         )}
 
+                        {/* Quantity Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                수량 <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex items-center space-x-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, quantity: Math.max(1, parseInt(prev.quantity) - 1) }))}
+                                    className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                                >
+                                    −
+                                </button>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    value={formData.quantity}
+                                    onChange={handleInputChange}
+                                    className="input-field w-20 text-center"
+                                    min="1"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, quantity: parseInt(prev.quantity) + 1 }))}
+                                    className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Submit Button */}
                         <div className="pt-4">
                             <Button
