@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 
 const Footer = () => {
@@ -52,9 +53,9 @@ const Footer = () => {
                     <div>
                         <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
                         <div className="space-y-2 text-sm">
-                            <a href="/products" className="block hover:text-gray-300 transition">All Products</a>
-                            <a href="/new" className="block hover:text-gray-300 transition">New Arrivals</a>
-                            <a href="/sale" className="block hover:text-gray-300 transition">Sale</a>
+                            <Link to="/products" className="block hover:text-gray-300 transition">All Products</Link>
+                            <Link to="/new" className="block hover:text-gray-300 transition">New Arrivals</Link>
+                            <Link to="/sale" className="block hover:text-gray-300 transition">Sale</Link>
                         </div>
                     </div>
                 </div>
