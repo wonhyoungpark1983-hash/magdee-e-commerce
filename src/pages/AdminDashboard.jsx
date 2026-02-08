@@ -626,7 +626,7 @@ const AdminDashboard = () => {
                             </Button>
                         </div>
 
-                        {/* Product Table */}
+                        {/* Desktop Product Table */}
                         <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[800px]">
@@ -680,6 +680,56 @@ const AdminDashboard = () => {
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+
+                        {/* Mobile Product Cards */}
+                        <div className="md:hidden space-y-4 pb-20">
+                            {products.map((product) => (
+                                <div key={product.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
+                                    <div className="flex-shrink-0">
+                                        <img src={product.image} alt={product.name} className="w-20 h-20 rounded-lg object-cover" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="font-bold text-gray-900 truncate pr-2">{product.name}</h3>
+                                                <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <button onClick={() => handleEdit(product)} className="p-1.5 bg-gray-50 rounded-lg text-gray-600">
+                                                    <Edit size={14} />
+                                                </button>
+                                                <button onClick={() => handleDelete(product.id)} className="p-1.5 bg-red-50 rounded-lg text-red-600">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-2 flex items-center justify-between">
+                                            <span className="font-bold text-primary">₩{product.price.toLocaleString()}</span>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => toggleFeatured(product.id)}
+                                                    className={`p-1.5 rounded-lg ${product.isFeatured ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400'}`}
+                                                >
+                                                    <Star size={14} fill={product.isFeatured ? 'currentColor' : 'none'} />
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleBestSeller(product.id)}
+                                                    className={`p-1.5 rounded-lg ${product.isBestSeller ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
+                                                >
+                                                    <TrendingUp size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {products.length === 0 && (
+                                <div className="text-center py-10 text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+                                    No products found. Add your first product!
+                                </div>
+                            )}
                         </div>
                     </>
                 );
