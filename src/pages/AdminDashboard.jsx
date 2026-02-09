@@ -106,13 +106,13 @@ const CustomersView = ({ customers }) => {
             {/* Customers Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[640px]">
+                    <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Name (Phone)</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">Email</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">Address</th>
-                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Orders</th>
+                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Orders</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Total Spent</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
@@ -122,9 +122,9 @@ const CustomersView = ({ customers }) => {
                             {filteredCustomers.map((customer) => (
                                 <tr key={customer.id} className="hover:bg-gray-50">
                                     <td className="px-4 lg:px-6 py-3 lg:py-4">
-                                        <div>
-                                            <p className="font-medium text-gray-900 text-sm">{customer.name}</p>
-                                            <p className="text-xs text-gray-500">{customer.phone}</p>
+                                        <div className="max-w-[120px] sm:max-w-none">
+                                            <p className="font-medium text-gray-900 text-sm truncate">{customer.name}</p>
+                                            <p className="text-xs text-gray-500 truncate">{customer.phone}</p>
                                         </div>
                                     </td>
                                     <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600 text-sm hidden md:table-cell">
@@ -139,12 +139,12 @@ const CustomersView = ({ customers }) => {
                                             <span className="truncate">{customer.address || '-'}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-900 font-medium text-sm">{customer.totalOrders}</td>
+                                    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-900 font-medium text-sm hidden sm:table-cell">{customer.totalOrders}</td>
                                     <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-900 font-medium text-sm hidden sm:table-cell">
                                         ₩{customer.totalSpent.toLocaleString()}
                                     </td>
                                     <td className="px-4 lg:px-6 py-3 lg:py-4">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(customer.status)}`}>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusBadge(customer.status)}`}>
                                             {customer.status}
                                         </span>
                                     </td>
@@ -955,9 +955,9 @@ const AdminDashboard = () => {
                                             <span>Date:</span>
                                             <span>{new Date(order.created_at).toLocaleDateString()}</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Total:</span>
-                                            <span className="font-bold text-primary">₩{order.total_amount?.toLocaleString()}</span>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-gray-500 text-sm">Total:</span>
+                                            <span className="font-bold text-gray-900">₩{(order.price || 0).toLocaleString()}</span>
                                         </div>
                                     </div>
 
@@ -1242,7 +1242,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.4 (Customer Details)
+                v1.4.3 (Fix: Order Total)
             </div>
         </div>
     );

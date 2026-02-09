@@ -213,7 +213,8 @@ export const ProductProvider = ({ children }) => {
             console.error('Error deleting order:', error.message);
             return false;
         } else {
-            setOrders(prev => prev.filter(o => o.id !== id));
+            // Optimistic update with type safety
+            setOrders(prev => prev.filter(o => String(o.id) !== String(id)));
             return true;
         }
     };
