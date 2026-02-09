@@ -1115,10 +1115,10 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                    v1.2.1 (Nav Update)
-                </div>
             )}
+            <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
+                v1.2.2 (Nav Update)
+            </div>
         </div>
     );
 };
