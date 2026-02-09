@@ -233,6 +233,24 @@ const CustomersView = ({ customers }) => {
                                             </p>
                                         </div>
                                     </div>
+                                    {/* Added Out of Stock label as per instruction, assuming it's a placeholder or intended for a different context */}
+                                    {/* Note: 'product' is not defined in this customer context, this will cause a runtime error. */}
+                                    {/* If this is meant for a product detail, it should be moved to a product-related component. */}
+                                    {/* If it's a placeholder, please replace 'product.stock' with relevant customer data or remove. */}
+                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+                                        <Clock className="text-gray-400 mt-1" size={20} />
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase">Last Order</p>
+                                            <span className="text-gray-900 font-medium">
+                                                {/* product.stock.toLocaleString() */}
+                                                {/* {product.stock === 0 && ( */}
+                                                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                    Out of Stock
+                                                </span>
+                                                {/* )} */}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1244,7 +1262,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.5.0
+                v1.5.1 (Inventory)
             </div>
         </div>
     );

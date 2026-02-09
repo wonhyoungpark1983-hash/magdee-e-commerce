@@ -174,16 +174,56 @@ export const ProductProvider = ({ children }) => {
     };
 
     const createOrder = async (orderData) => {
-        const { data, error } = await supabase
-            .from('orders')
-            .insert([orderData])
-            .select();
+        try {
+            // 1. Check current stock first
+            const { data: productData, error: productError } = await supabase
+                .from('products')
+                .select('stock')
+                .eq('id', orderData.product_id)
+                .single();
 
-        if (error) {
-            console.error('Error creating order:', error.message);
+            if (productError || !productData) {
+                console.error('Error checking stock:', productError);
+                return null;
+            }
+
+            if (productData.stock < orderData.quantity) {
+                alert(`Not enough stock! Only ${productData.stock} left.`);
+                return null;
+            }
+
+            // 2. Deduct stock
+            const newStock = productData.stock - orderData.quantity;
+            const { error: updateError } = await supabase
+                .from('products')
+                .update({ stock: newStock })
+                .eq('id', orderData.product_id);
+
+            if (updateError) {
+                console.error('Error updating stock:', updateError);
+                return null;
+            }
+
+            // 3. Create Order
+            const { data, error } = await supabase
+                .from('orders')
+                .insert([orderData])
+                .select();
+
+            if (error) {
+                console.error('Error creating order:', error.message);
+                // ROLLBACK: Restore stock if order fails
+                await supabase
+                    .from('products')
+                    .update({ stock: productData.stock })
+                    .eq('id', orderData.product_id);
+                return null;
+            }
+            return data[0];
+        } catch (err) {
+            console.error('Unexpected error in createOrder:', err);
             return null;
         }
-        return data[0];
     };
 
     const updateOrderStatus = async (orderId, status) => {

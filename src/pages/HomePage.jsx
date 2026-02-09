@@ -17,13 +17,14 @@ const HomePage = () => {
         );
     }
 
-    // Filter products based on admin selection
-    const newArrivals = products.filter(p => p.isFeatured);
-    const bestSellers = products.filter(p => p.isBestSeller);
+    // Filter products based on admin selection AND availablity
+    const availableProducts = products.filter(p => p.stock > 0);
+    const newArrivals = availableProducts.filter(p => p.isFeatured);
+    const bestSellers = availableProducts.filter(p => p.isBestSeller);
 
     // If no featured products, show all products
     const hasFeatures = newArrivals.length > 0 || bestSellers.length > 0;
-    const allProducts = products.slice(0, 12); // Show up to 12 products on homepage
+    const allProducts = availableProducts.slice(0, 12); // Show up to 12 products on homepage
 
     return (
         <div className="min-h-screen bg-white">

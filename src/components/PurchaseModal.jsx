@@ -236,6 +236,7 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, quantity: Math.max(1, parseInt(prev.quantity) - 1) }))}
                                         className="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                                        disabled={formData.quantity <= 1}
                                     >
                                         −
                                     </button>
@@ -243,18 +244,28 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
                                         type="number"
                                         name="quantity"
                                         value={formData.quantity}
-                                        onChange={handleInputChange}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 1;
+                                            // Enforce max stock limit
+                                            const validVal = Math.min(Math.max(1, val), product.stock);
+                                            setFormData(prev => ({ ...prev, quantity: validVal }));
+                                        }}
                                         className="input-field w-16 text-center text-sm font-bold"
                                         min="1"
+                                        max={product.stock}
                                         required
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, quantity: parseInt(prev.quantity) + 1 }))}
+                                        onClick={() => setFormData(prev => ({ ...prev, quantity: Math.min(product.stock, parseInt(prev.quantity) + 1) }))}
                                         className="w-10 h-10 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                                        disabled={formData.quantity >= product.stock}
                                     >
                                         +
                                     </button>
+                                    <span className="text-xs text-gray-400 ml-2">
+                                        (Max: {product.stock})
+                                    </span>
                                 </div>
                             </div>
                         </form>

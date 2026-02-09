@@ -24,7 +24,8 @@ const ProductsPage = () => {
         const matchesCategory = selectedCategory === 'ALL' || product.category === selectedCategory;
         const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             product.brand.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
+        const inStock = product.stock > 0;
+        return matchesCategory && matchesSearch && inStock;
     });
 
     const sortedProducts = [...filteredProducts].sort((a, b) => {
