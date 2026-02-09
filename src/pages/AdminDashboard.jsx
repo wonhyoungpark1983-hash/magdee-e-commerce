@@ -1244,7 +1244,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.4.4 (Fix: Desktop Price)
+                v1.4.5 (Debug: Delete)
             </div>
         </div>
     );

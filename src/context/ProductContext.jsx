@@ -211,6 +211,7 @@ export const ProductProvider = ({ children }) => {
 
         if (error) {
             console.error('Error deleting order:', error.message);
+            alert(`Failed to delete order: ${error.message}`); // Show error to user
             return false;
         } else {
             // Optimistic update with type safety
