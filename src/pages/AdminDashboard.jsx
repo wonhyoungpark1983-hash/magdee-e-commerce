@@ -886,6 +886,7 @@ const AdminDashboard = () => {
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Order ID</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Customer</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Product</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Total</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Action</th>
@@ -900,6 +901,7 @@ const AdminDashboard = () => {
                                                     <div className="text-xs text-gray-400">{order.customer_phone}</div>
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{order.product_name}</td>
+                                                <td className="px-6 py-4 text-sm font-bold text-gray-900">₩{(order.price || 0).toLocaleString()}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString()}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium 
@@ -1242,7 +1244,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.4.3 (Fix: Order Total)
+                v1.4.4 (Fix: Desktop Price)
             </div>
         </div>
     );
