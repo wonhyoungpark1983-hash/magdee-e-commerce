@@ -11,6 +11,7 @@ const CustomersView = ({ customers }) => {
     const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [viewingCustomer, setViewingCustomer] = useState(null);
 
     useEffect(() => {
         let filtered = customers;
@@ -22,7 +23,8 @@ const CustomersView = ({ customers }) => {
         if (searchTerm) {
             filtered = filtered.filter(customer =>
                 customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                customer.phone.includes(searchTerm)
+                customer.phone.includes(searchTerm) ||
+                (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -45,6 +47,7 @@ const CustomersView = ({ customers }) => {
                 <p className="text-gray-600 mt-1 text-sm lg:text-base">Manage customer information</p>
             </div>
 
+            {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6">
                     <p className="text-gray-600 text-sm">Total Customers</p>
@@ -70,13 +73,14 @@ const CustomersView = ({ customers }) => {
                 </div>
             </div>
 
+            {/* Search and Filters */}
             <div className="bg-white rounded-xl shadow-sm p-4 lg:p-6 mb-6">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                     <div className="relative flex-1 lg:max-w-md">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                         <input
                             type="text"
-                            placeholder="Search by name or email..."
+                            placeholder="Search by name, email or phone..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -99,17 +103,19 @@ const CustomersView = ({ customers }) => {
                 </div>
             </div>
 
+            {/* Customers Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[640px]">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
+                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Name (Phone)</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">Email</th>
-                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">Phone</th>
+                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">Address</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Orders</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Total Spent</th>
                                 <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                                <th className="px-4 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -118,7 +124,7 @@ const CustomersView = ({ customers }) => {
                                     <td className="px-4 lg:px-6 py-3 lg:py-4">
                                         <div>
                                             <p className="font-medium text-gray-900 text-sm">{customer.name}</p>
-                                            <p className="text-xs text-gray-500 md:hidden">{customer.email}</p>
+                                            <p className="text-xs text-gray-500">{customer.phone}</p>
                                         </div>
                                     </td>
                                     <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600 text-sm hidden md:table-cell">
@@ -127,10 +133,10 @@ const CustomersView = ({ customers }) => {
                                             {customer.email}
                                         </div>
                                     </td>
-                                    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600 text-sm hidden lg:table-cell">
-                                        <div className="flex items-center">
-                                            <Phone size={14} className="mr-1 text-gray-400" />
-                                            {customer.phone}
+                                    <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-600 text-sm hidden lg:table-cell max-w-xs truncate">
+                                        <div className="flex items-center" title={customer.address}>
+                                            <Package size={14} className="mr-1 text-gray-400 flex-shrink-0" />
+                                            <span className="truncate">{customer.address || '-'}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 lg:px-6 py-3 lg:py-4 text-gray-900 font-medium text-sm">{customer.totalOrders}</td>
@@ -142,12 +148,106 @@ const CustomersView = ({ customers }) => {
                                             {customer.status}
                                         </span>
                                     </td>
+                                    <td className="px-4 lg:px-6 py-3 lg:py-4">
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            onClick={() => setViewingCustomer(customer)}
+                                        >
+                                            View
+                                        </Button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* Customer Detail Modal */}
+            {viewingCustomer && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-lg relative shadow-2xl">
+                        <button
+                            onClick={() => setViewingCustomer(null)}
+                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <div className="p-8">
+                            <div className="text-center mb-6">
+                                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full text-2xl font-bold mb-4 ${viewingCustomer.status === 'VIP' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'
+                                    }`}>
+                                    {viewingCustomer.name.charAt(0)}
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">{viewingCustomer.name}</h2>
+                                <span className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(viewingCustomer.status)}`}>
+                                    {viewingCustomer.status} Customer
+                                </span>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 bg-gray-50 rounded-xl text-center">
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Spent</p>
+                                        <p className="text-xl font-bold text-primary mt-1">₩{viewingCustomer.totalSpent.toLocaleString()}</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-xl text-center">
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Orders</p>
+                                        <p className="text-xl font-bold text-gray-900 mt-1">{viewingCustomer.totalOrders}</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+                                        <Phone className="text-gray-400 mt-1" size={20} />
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase">Phone Number</p>
+                                            <p className="text-gray-900 font-medium">{viewingCustomer.phone}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+                                        <Mail className="text-gray-400 mt-1" size={20} />
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase">Email Address</p>
+                                            <p className="text-gray-900 font-medium">{viewingCustomer.email || 'No email provided'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+                                        <Package className="text-gray-400 mt-1" size={20} />
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase">Shipping Address</p>
+                                            <p className="text-gray-900 font-medium leading-relaxed">{viewingCustomer.address || 'No address provided'}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+                                        <Clock className="text-gray-400 mt-1" size={20} />
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase">Last Order</p>
+                                            <p className="text-gray-900 font-medium">
+                                                {new Date(viewingCustomer.lastOrder).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8">
+                                <Button
+                                    className="w-full"
+                                    onClick={() => setViewingCustomer(null)}
+                                >
+                                    Close Details
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -480,7 +580,7 @@ const AdminDashboard = () => {
         const existing = acc.find(c => c.phone === order.customer_phone);
         if (existing) {
             existing.totalSpent += order.price || 0;
-            existing.orderCount += 1;
+            existing.totalOrders += 1; // Fixed: Changed from orderCount
             if (new Date(order.created_at) > new Date(existing.lastOrder)) {
                 existing.lastOrder = order.created_at;
             }
@@ -491,7 +591,7 @@ const AdminDashboard = () => {
                 phone: order.customer_phone,
                 email: order.customer_email || 'No Email',
                 totalSpent: order.price || 0,
-                orderCount: 1,
+                totalOrders: 1, // Fixed: Changed from orderCount to totalOrders
                 lastOrder: order.created_at,
                 address: order.address,
                 status: (order.price > 1000000) ? 'VIP' : 'Regular' // Simple mock logic
@@ -1142,7 +1242,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.3 (Order Mgmt)
+                v1.4 (Customer Details)
             </div>
         </div>
     );
