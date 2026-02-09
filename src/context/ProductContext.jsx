@@ -204,17 +204,22 @@ export const ProductProvider = ({ children }) => {
     };
 
     const deleteOrder = async (id) => {
-        const { error } = await supabase
+        const { error, count } = await supabase
             .from('orders')
-            .delete()
+            .delete({ count: 'exact' })
             .eq('id', id);
 
         if (error) {
             console.error('Error deleting order:', error.message);
-            alert(`Failed to delete order: ${error.message}`); // Show error to user
+            alert(`Failed to delete order: ${error.message}`);
+            return false;
+        } else if (count === 0) {
+            // RLS Policy likely blocked the deletion silently
+            console.error('Delete operation returned 0 rows affected (RLS blocked?)');
+            alert('Delete Failed: Permission Denied (Database Policy blocked existing deletion). Please check Supabase RLS.');
             return false;
         } else {
-            // Optimistic update with type safety
+            // Optimistic update
             setOrders(prev => prev.filter(o => String(o.id) !== String(id)));
             return true;
         }
