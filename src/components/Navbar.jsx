@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, ShoppingBag } from 'lucide-react';
+import { Search, Menu, X, User, Package } from 'lucide-react';
 
 import logo from '../assets/magdee_logo.png';
 
@@ -41,14 +41,19 @@ const Navbar = () => {
                     </div>
 
                     {/* Icons */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center gap-3">
+                        {/* Order Tracking Button - Enhanced Visibility */}
+                        <Link
+                            to="/my-orders"
+                            className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-sm transform hover:scale-105"
+                        >
+                            <Package size={16} />
+                            <span className="text-xs font-bold tracking-wide">ORDER TRACKING</span>
+                        </Link>
+
                         <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
                             <Search size={20} className="text-gray-700" />
                         </button>
-                        <Link to="/my-orders" className="p-2 hover:bg-gray-50 rounded-full transition-colors">
-                            <ShoppingBag size={20} className="text-gray-700" />
-                        </Link>
-
 
                         {/* Mobile Menu Button */}
                         <button
@@ -69,11 +74,11 @@ const Navbar = () => {
                         <Link
                             to="/my-orders"
                             onClick={() => setIsMenuOpen(false)}
-                            className="block py-3 px-4 rounded-lg bg-primary text-white font-bold text-center mb-4 shadow-sm"
+                            className="block py-3 px-4 rounded-lg bg-gray-900 text-white font-bold text-center mb-4 shadow-sm"
                         >
                             <div className="flex items-center justify-center gap-2">
-                                <ShoppingBag size={18} />
-                                MY ORDERS
+                                <Package size={18} />
+                                ORDER TRACKING
                             </div>
                         </Link>
                         <Link
