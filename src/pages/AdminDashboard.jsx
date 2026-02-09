@@ -442,7 +442,7 @@ const SettingsView = ({ settings, updateSettings }) => {
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { products, orders, settings, loading, addProduct, updateProduct, deleteProduct, toggleFeatured, toggleBestSeller, updateSettings, updateOrderStatus } = useProducts();
+    const { products, orders, settings, loading, addProduct, updateProduct, deleteProduct, toggleFeatured, toggleBestSeller, updateSettings, updateOrderStatus, deleteOrder } = useProducts();
     const [activeView, setActiveView] = useState('orders'); // Default to orders
     const [orderFilter, setOrderFilter] = useState('ACTIVE');
     const [showModal, setShowModal] = useState(false);
@@ -569,6 +569,16 @@ const AdminDashboard = () => {
         if (confirm('Are you sure you want to delete this product?')) {
             await deleteProduct(productId);
             alert('Product deleted successfully!');
+        }
+    };
+
+    const handleDeleteOrder = async (orderId) => {
+        if (window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+            const success = await deleteOrder(orderId);
+            if (success) {
+                // Determine which order filter to return to or stay on
+                // Ideally, do nothing, the state updates automatically via context
+            }
         }
     };
 
@@ -800,8 +810,15 @@ const AdminDashboard = () => {
                                                         {order.status}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 flex items-center gap-2">
                                                     <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handleOrderClick(order); }}>View</Button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order.id); }}
+                                                        className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition"
+                                                        title="Delete Order"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -844,9 +861,17 @@ const AdminDashboard = () => {
                                         </div>
                                     </div>
 
-                                    <Button size="sm" variant="secondary" className="w-full" onClick={(e) => { e.stopPropagation(); handleOrderClick(order); }}>
-                                        View Details
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button size="sm" variant="secondary" className="flex-1" onClick={(e) => { e.stopPropagation(); handleOrderClick(order); }}>
+                                            View Details
+                                        </Button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order.id); }}
+                                            className="px-3 py-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition flex items-center justify-center"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                             {filteredOrders.length === 0 && (
@@ -1117,7 +1142,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.2.2 (Nav Update)
+                v1.3 (Order Mgmt)
             </div>
         </div>
     );

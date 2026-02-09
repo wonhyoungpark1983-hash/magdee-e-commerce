@@ -203,6 +203,21 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
+    const deleteOrder = async (id) => {
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            console.error('Error deleting order:', error.message);
+            return false;
+        } else {
+            setOrders(prev => prev.filter(o => o.id !== id));
+            return true;
+        }
+    };
+
     const getOrdersByPhone = (phone) => {
         return orders.filter(order => order.customer_phone === phone);
     };
@@ -220,6 +235,7 @@ export const ProductProvider = ({ children }) => {
         updateSettings,
         createOrder,
         updateOrderStatus,
+        deleteOrder,
         getOrdersByPhone,
     };
 
