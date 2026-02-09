@@ -444,7 +444,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const { products, orders, settings, loading, addProduct, updateProduct, deleteProduct, toggleFeatured, toggleBestSeller, updateSettings, updateOrderStatus } = useProducts();
     const [activeView, setActiveView] = useState('orders'); // Default to orders
-    const [orderFilter, setOrderFilter] = useState('ALL');
+    const [orderFilter, setOrderFilter] = useState('ACTIVE');
     const [showModal, setShowModal] = useState(false);
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -738,7 +738,11 @@ const AdminDashboard = () => {
                 );
             case 'orders':
                 // Filter orders
-                const filteredOrders = orderFilter === 'ALL' ? orders : orders.filter(o => o.status === orderFilter);
+                const filteredOrders = orders.filter(o => {
+                    if (orderFilter === 'ALL') return true;
+                    if (orderFilter === 'ACTIVE') return ['PENDING', 'PAID', 'SHIPPED'].includes(o.status);
+                    return o.status === orderFilter;
+                });
 
                 return (
                     <div className="mt-16 lg:mt-0">
@@ -746,19 +750,25 @@ const AdminDashboard = () => {
                             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Order Management</h2>
                         </div>
                         {/* Order Filters */}
-                        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                            {['ALL', 'PENDING', 'SHIPPED', 'COMPLETED', 'CANCELLED'].map(status => (
+                        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                            {[
+                                { id: 'ACTIVE', label: 'Active Orders' },
+                                { id: 'COMPLETED', label: 'Completed' },
+                                { id: 'CANCELLED', label: 'Cancelled' },
+                                { id: 'ALL', label: 'All Orders' }
+                            ].map(filter => (
                                 <button
-                                    key={status}
-                                    onClick={() => setOrderFilter(status)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${orderFilter === status ? 'bg-primary text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                                    key={filter.id}
+                                    onClick={() => setOrderFilter(filter.id)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${orderFilter === filter.id ? 'bg-primary text-white shadow-md' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                    {status === 'ALL' ? 'All Orders' : status.charAt(0) + status.slice(1).toLowerCase()}
+                                    {filter.label}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                        {/* Desktop Order Table */}
+                        <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[800px]">
                                     <thead className="bg-gray-50 border-b border-gray-200">
@@ -799,6 +809,52 @@ const AdminDashboard = () => {
                                 </table>
                             </div>
                         </div>
+
+
+                        {/* Mobile Order Cards */}
+                        <div className="md:hidden space-y-4 pb-20">
+                            {filteredOrders.map(order => (
+                                <div key={order.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100" onClick={() => handleOrderClick(order)}>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <span className="text-xs font-bold text-gray-400">ORDER #{order.id.slice(0, 8)}</span>
+                                            <h3 className="font-bold text-gray-900 mt-1">{order.customer_name}</h3>
+                                        </div>
+                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold 
+                                            ${order.status === 'PENDING' ? 'bg-orange-100 text-orange-800' :
+                                                order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
+                                                    order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                                        'bg-red-100 text-red-800'}`}>
+                                            {order.status}
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-2 text-sm text-gray-600 mb-4">
+                                        <div className="flex justify-between">
+                                            <span>Product:</span>
+                                            <span className="font-medium text-gray-900">{order.product_name}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Date:</span>
+                                            <span>{new Date(order.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Total:</span>
+                                            <span className="font-bold text-primary">₩{order.total_amount?.toLocaleString()}</span>
+                                        </div>
+                                    </div>
+
+                                    <Button size="sm" variant="secondary" className="w-full" onClick={(e) => { e.stopPropagation(); handleOrderClick(order); }}>
+                                        View Details
+                                    </Button>
+                                </div>
+                            ))}
+                            {filteredOrders.length === 0 && (
+                                <div className="text-center py-10 text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
+                                    No orders found in this filter.
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             case 'customers':
@@ -825,7 +881,7 @@ const AdminDashboard = () => {
 
             {/* Sidebar */}
             <div className={`fixed left-0 top-0 h-full w-64 bg-primary text-white p-6 transform transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-                <h1 className="font-heading text-2xl font-bold mb-8 mt-12 lg:mt-0">MAGDEE <span className="text-xs font-normal opacity-70">v1.1</span></h1>
+                <h1 className="font-heading text-2xl font-bold mb-8 mt-12 lg:mt-0">MAGDEE</h1>
                 <nav className="space-y-2">
                     <button
                         onClick={() => { setActiveView('orders'); setMobileMenuOpen(false); }}

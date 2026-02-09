@@ -56,12 +56,16 @@ const Footer = () => {
                             <Link to="/products" className="block hover:text-gray-300 transition">All Products</Link>
                             <Link to="/new" className="block hover:text-gray-300 transition">New Arrivals</Link>
                             <Link to="/sale" className="block hover:text-gray-300 transition">Sale</Link>
+                            <Link to="/my-orders" className="block hover:text-gray-300 transition font-medium text-white">My Orders</Link>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white border-opacity-20 mt-8 pt-8 text-center text-sm text-gray-300">
+                <div className="border-t border-white border-opacity-20 mt-8 pt-8 text-center text-sm text-gray-300 flex flex-col items-center gap-4">
                     <p>&copy; {new Date().getFullYear()} {settings.businessName || 'MAGDEE'}. All rights reserved.</p>
+                    <Link to="/admin" className="text-xs text-gray-500 hover:text-gray-400 opacity-50 transition-opacity hover:opacity-100">
+                        Admin Access
+                    </Link>
                 </div>
             </div>
         </footer>

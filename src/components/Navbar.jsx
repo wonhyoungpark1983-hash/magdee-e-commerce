@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User } from 'lucide-react';
+import { Search, Menu, X, User, ShoppingBag } from 'lucide-react';
 
 import logo from '../assets/magdee_logo.png';
 
@@ -9,7 +9,7 @@ const Navbar = () => {
     const location = useLocation();
 
     const menuItems = [
-        { name: 'MY ORDERS', path: '/my-orders' },
+        // { name: 'MY ORDERS', path: '/my-orders' }, // Moved to explicit link/icon
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -45,8 +45,8 @@ const Navbar = () => {
                         <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
                             <Search size={20} className="text-gray-700" />
                         </button>
-                        <Link to="/admin" className="p-2 hover:bg-gray-50 rounded-full transition-colors hidden md:block">
-                            <User size={20} className="text-gray-700" />
+                        <Link to="/my-orders" className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                            <ShoppingBag size={20} className="text-gray-700" />
                         </Link>
 
 
@@ -65,24 +65,27 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className="md:hidden border-t border-gray-100 bg-white">
                     <div className="px-4 py-4 space-y-3">
-                        {menuItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={`block py-2 ${isActive(item.path) ? 'nav-link-active' : 'nav-link'}`}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
+                        {/* Mobile Menu Items */}
                         <Link
-                            to="/admin"
+                            to="/my-orders"
                             onClick={() => setIsMenuOpen(false)}
-                            className="block py-2 nav-link font-bold text-primary flex items-center"
+                            className="block py-3 px-4 rounded-lg bg-primary text-white font-bold text-center mb-4 shadow-sm"
                         >
-                            <User size={18} className="mr-2" />
-                            ADMIN PAGE
+                            <div className="flex items-center justify-center gap-2">
+                                <ShoppingBag size={18} />
+                                MY ORDERS
+                            </div>
                         </Link>
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={`block py-2 ${isActive(item.path) ? 'nav-link-active' : 'nav-link'}`}
+                        >
+                            {item.name}
+                        </Link>
+
+
                     </div>
                 </div>
             )}
