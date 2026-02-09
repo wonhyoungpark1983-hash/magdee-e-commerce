@@ -63,9 +63,12 @@ const Footer = () => {
 
                 <div className="border-t border-white border-opacity-20 mt-8 pt-8 text-center text-sm text-gray-300 flex flex-col items-center gap-4">
                     <p>&copy; {new Date().getFullYear()} {settings.businessName || 'MAGDEE'}. All rights reserved.</p>
-                    <Link to="/admin" className="text-xs text-gray-500 hover:text-gray-400 opacity-50 transition-opacity hover:opacity-100">
-                        Admin Access
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <Link to="/admin" className="text-xs text-gray-500 hover:text-gray-400 opacity-50 transition-opacity hover:opacity-100">
+                            Admin Access
+                        </Link>
+                        <span className="text-xs text-gray-600 opacity-30">v1.5.8</span>
+                    </div>
                 </div>
             </div>
         </footer>

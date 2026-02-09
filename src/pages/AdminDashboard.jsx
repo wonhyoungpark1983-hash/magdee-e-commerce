@@ -1291,7 +1291,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.5.7 (UX Polish)
+                v1.5.8 (Live Fix)
             </div>
         </div>
     );
