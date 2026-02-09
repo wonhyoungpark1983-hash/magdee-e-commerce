@@ -180,21 +180,21 @@ const ProductDetailPage = () => {
                                 className="w-full"
                                 onClick={() => {
                                     if (!selectedSize && productSizes.length > 0) {
-                                        alert('사이즈를 선택해주세요.');
+                                        alert('Please select a size.');
                                         return;
                                     }
                                     if (!selectedColor && productColors.length > 0) {
-                                        alert('컬러를 선택해주세요.');
+                                        alert('Please select a color.');
                                         return;
                                     }
                                     setShowPurchaseModal(true);
                                 }}
                             >
                                 <Send className="mr-2" size={20} />
-                                구매하기
+                                Purchase Now
                             </Button>
                             <p className="text-sm text-gray-500 text-center">
-                                실시간 주문 현황은 내 주문 페이지에서 확인 가능합니다
+                                You can check real-time order status on My Orders page.
                             </p>
                         </div>
 
