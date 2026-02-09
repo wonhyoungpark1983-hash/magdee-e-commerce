@@ -233,24 +233,6 @@ const CustomersView = ({ customers }) => {
                                             </p>
                                         </div>
                                     </div>
-                                    {/* Added Out of Stock label as per instruction, assuming it's a placeholder or intended for a different context */}
-                                    {/* Note: 'product' is not defined in this customer context, this will cause a runtime error. */}
-                                    {/* If this is meant for a product detail, it should be moved to a product-related component. */}
-                                    {/* If it's a placeholder, please replace 'product.stock' with relevant customer data or remove. */}
-                                    <div className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
-                                        <Clock className="text-gray-400 mt-1" size={20} />
-                                        <div>
-                                            <p className="text-xs text-gray-500 font-medium uppercase">Last Order</p>
-                                            <span className="text-gray-900 font-medium">
-                                                {/* product.stock.toLocaleString() */}
-                                                {/* {product.stock === 0 && ( */}
-                                                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                                                    Out of Stock
-                                                </span>
-                                                {/* )} */}
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -269,6 +251,17 @@ const CustomersView = ({ customers }) => {
         </div>
     );
 };
+
+// ... (skipping AnalyticsView and SettingsView as they match) ... 
+
+// ARBITRARY JUMP TO PRODUCT TABLE TO ADD STOCK COLUMN
+// Note for AI: I cannot skip lines in replace_file_content unless I use multi_replace or separate calls.
+// Since the file is huge and I need to edit two far-apart places, I will use multi_replace_file_content.
+// Wait, I am using replace_file_content but I can only disable one block?
+// No, I should use multi_replace_file_content if I want to do this in one go.
+// Or just make two calls. I'll make two calls to be safe and simple.
+
+// This first call will JUST remove the garbage code.
 
 const AnalyticsView = ({ orders }) => {
     // Dynamic calculations based on real orders
@@ -766,6 +759,7 @@ const AdminDashboard = () => {
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Product</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Category</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Price</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Stock</th>
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Featured</th>
                                             <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Best</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
@@ -780,6 +774,14 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
                                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">₩{product.price.toLocaleString()}</td>
+                                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                                    {product.stock.toLocaleString()}
+                                                    {product.stock === 0 && (
+                                                        <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                            Out of Stock
+                                                        </span>
+                                                    )}
+                                                </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <button
                                                         onClick={() => toggleFeatured(product.id)}
@@ -824,7 +826,17 @@ const AdminDashboard = () => {
                                         <div className="flex justify-between items-start">
                                             <div>
                                                 <h3 className="font-bold text-gray-900 truncate pr-2">{product.name}</h3>
-                                                <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                                                    <p className="text-xs text-gray-400 mb-1">
+                                                        • Stock: {product.stock}
+                                                    </p>
+                                                    {product.stock === 0 && (
+                                                        <span className="mb-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800">
+                                                            SOLD OUT
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <button onClick={() => handleEdit(product)} className="p-1.5 bg-gray-50 rounded-lg text-gray-600">
@@ -1262,7 +1274,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.5.1 (Inventory)
+                v1.5.3 (Stock Fix)
             </div>
         </div>
     );
