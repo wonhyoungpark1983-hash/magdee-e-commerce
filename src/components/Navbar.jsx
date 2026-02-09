@@ -1,16 +1,13 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 import logo from '../assets/magdee_logo.png';
 
 const Navbar = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
 
-    const menuItems = [
-        // { name: 'MY ORDERS', path: '/my-orders' }, // Moved to explicit link/icon
-    ];
+    // Menu items are currently empty as requested to remove the menu
+    const menuItems = [];
 
     const isActive = (path) => location.pathname === path;
 
@@ -20,14 +17,14 @@ const Navbar = () => {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3">
-                        <img src={logo} alt="MAGDEE" className="h-12 w-auto object-contain" />
+                        <img src={logo} alt="MAGDEE" className="h-10 md:h-12 w-auto object-contain" />
                         <div className="flex flex-col">
-                            <span className="font-heading text-xl font-bold text-primary leading-none tracking-tight">MAGDEE</span>
-                            <span className="text-[10px] tracking-[0.2em] text-gray-500 font-medium mt-0.5">LUXURY WEARS</span>
+                            <span className="font-heading text-lg md:text-xl font-bold text-primary leading-none tracking-tight">MAGDEE</span>
+                            <span className="text-[8px] md:text-[10px] tracking-[0.2em] text-gray-500 font-medium mt-0.5">LUXURY WEARS</span>
                         </div>
                     </Link>
 
-                    {/* Desktop Menu */}
+                    {/* Desktop Menu (Hidden for now as list is empty, but keeping structure if needed later) */}
                     <div className="hidden md:flex items-center space-x-8">
                         {menuItems.map((item) => (
                             <Link
@@ -40,60 +37,20 @@ const Navbar = () => {
                         ))}
                     </div>
 
-                    {/* Icons */}
+                    {/* Icons / Actions */}
                     <div className="flex items-center gap-3">
-                        {/* Order Tracking Button - Enhanced Visibility */}
+                        {/* Order Tracking Button - Visible on ALL screens now */}
                         <Link
                             to="/my-orders"
-                            className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-sm transform hover:scale-105"
+                            className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-sm transform hover:scale-105"
                         >
-                            <Package size={16} />
-                            <span className="text-xs font-bold tracking-wide">ORDER TRACKING</span>
+                            <Package size={14} className="md:hidden" />
+                            <Package size={16} className="hidden md:block" />
+                            <span className="text-[10px] md:text-xs font-bold tracking-wide">ORDER TRACKING</span>
                         </Link>
-
-                        <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
-                            <Search size={20} className="text-gray-700" />
-                        </button>
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden p-2 hover:bg-gray-50 rounded-full transition-colors"
-                        >
-                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-                <div className="md:hidden border-t border-gray-100 bg-white">
-                    <div className="px-4 py-4 space-y-3">
-                        {/* Mobile Menu Items */}
-                        <Link
-                            to="/my-orders"
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block py-3 px-4 rounded-lg bg-gray-900 text-white font-bold text-center mb-4 shadow-sm"
-                        >
-                            <div className="flex items-center justify-center gap-2">
-                                <Package size={18} />
-                                ORDER TRACKING
-                            </div>
-                        </Link>
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            onClick={() => setIsMenuOpen(false)}
-                            className={`block py-2 ${isActive(item.path) ? 'nav-link-active' : 'nav-link'}`}
-                        >
-                            {item.name}
-                        </Link>
-
-
-                    </div>
-                </div>
-            )}
         </nav>
     );
 };
