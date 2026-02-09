@@ -64,7 +64,8 @@ const PurchaseModal = ({ product, isOpen, onClose, adminPhone, initialSize, init
             color: formData.selectedColor,
             quantity: parseInt(formData.quantity) || 1,
             status: 'PENDING',
-            price: product.price // Save price at order time
+            price: product.price, // Save price at order time
+            product_image: product.image // Save product image reference
         };
 
         try {

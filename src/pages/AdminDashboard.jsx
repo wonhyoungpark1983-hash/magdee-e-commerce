@@ -586,6 +586,11 @@ const AdminDashboard = () => {
         navigate('/admin');
     };
 
+    const getOrderImage = (order) => {
+        if (!order) return null;
+        return order.product_image || products.find(p => p.id === order.product_id)?.image;
+    };
+
     // Calculate customers derived from orders for CustomersView
     const customers = orders.reduce((acc, order) => {
         const existing = acc.find(c => c.phone === order.customer_phone);
@@ -930,7 +935,14 @@ const AdminDashboard = () => {
                                                     <div>{order.customer_name}</div>
                                                     <div className="text-xs text-gray-400">{order.customer_phone}</div>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{order.product_name}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-600">
+                                                    <div className="flex items-center gap-3">
+                                                        {getOrderImage(order) && (
+                                                            <img src={getOrderImage(order)} alt="" className="w-10 h-10 rounded object-cover border border-gray-100" />
+                                                        )}
+                                                        <span className="font-medium">{order.product_name}</span>
+                                                    </div>
+                                                </td>
                                                 <td className="px-6 py-4 text-sm font-bold text-gray-900">₩{(order.price || 0).toLocaleString()}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{new Date(order.created_at).toLocaleDateString()}</td>
                                                 <td className="px-6 py-4">
@@ -981,7 +993,12 @@ const AdminDashboard = () => {
                                     <div className="space-y-2 text-sm text-gray-600 mb-4">
                                         <div className="flex justify-between">
                                             <span>Product:</span>
-                                            <span className="font-medium text-gray-900">{order.product_name}</span>
+                                            <div className="flex items-center gap-2">
+                                                {getOrderImage(order) && (
+                                                    <img src={getOrderImage(order)} alt="" className="w-8 h-8 rounded object-cover border border-gray-100" />
+                                                )}
+                                                <span className="font-medium text-gray-900">{order.product_name}</span>
+                                            </div>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Date:</span>
@@ -1212,8 +1229,8 @@ const AdminDashboard = () => {
                                 <div>
                                     <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Product Info</h4>
                                     <div className="flex gap-4">
-                                        {selectedOrder.product_image && (
-                                            <img src={selectedOrder.product_image} alt="Product" className="w-16 h-16 rounded-lg object-cover" />
+                                        {getOrderImage(selectedOrder) && (
+                                            <img src={getOrderImage(selectedOrder)} alt="Product" className="w-16 h-16 rounded-lg object-cover" />
                                         )}
                                         <div>
                                             <p className="font-bold text-gray-900">{selectedOrder.product_name}</p>
@@ -1274,7 +1291,7 @@ const AdminDashboard = () => {
                 </div>
             )}
             <div className="mt-8 text-center text-xs text-gray-400 opacity-50 pb-4">
-                v1.5.6 (Nav Clean)
+                v1.5.7 (UX Polish)
             </div>
         </div>
     );

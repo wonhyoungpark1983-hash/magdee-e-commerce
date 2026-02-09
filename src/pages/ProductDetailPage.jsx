@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft } from 'lucide-react';
 import Button from '../components/Button';
 import PurchaseModal from '../components/PurchaseModal';
 import { useProducts } from '../context/ProductContext';
@@ -61,6 +61,13 @@ const ProductDetailPage = () => {
     return (
         <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+                >
+                    <ArrowLeft size={20} className="mr-2" />
+                    Back
+                </button>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Product Images */}
                     <div>

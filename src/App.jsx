@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ProductProvider } from './context/ProductContext';
 import Navbar from './components/Navbar';
+import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
@@ -12,6 +13,7 @@ function App() {
   return (
     <ProductProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public Routes with Navbar */}
           <Route path="/" element={
