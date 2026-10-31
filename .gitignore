@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 환경 변수 — 키는 Vercel 프로젝트 설정에만 둔다
+.env
+.env.*
+!.env.example
